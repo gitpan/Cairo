@@ -1,0 +1,38 @@
+#
+# Copyright (c) 2004-2005 by the cairo perl team (see the file README)
+#
+# Licensed under the LGPL, see LICENSE file for more information.
+#
+# $Header: /cvs/cairo/cairo-perl/cairo-perl.typemap,v 1.3 2005/07/29 17:19:55 tsch Exp $
+#
+
+TYPEMAP
+
+cairo_bool_t		T_IV
+
+cairo_font_extents_t *	T_CAIRO_FONT_EXTENTS
+cairo_text_extents_t *	T_CAIRO_TEXT_EXTENTS
+cairo_glyph_t *		T_CAIRO_GLYPH
+cairo_path_t *		T_CAIRO_PATH
+
+INPUT
+
+T_CAIRO_GLYPH
+	$var = SvCairoGlyph ($arg);
+
+T_CAIRO_PATH
+	$var = SvCairoPath ($arg);
+
+OUTPUT
+
+T_CAIRO_FONT_EXTENTS
+	$arg = newSVCairoFontExtents ($var);
+
+T_CAIRO_TEXT_EXTENTS
+	$arg = newSVCairoTextExtents ($var);
+
+T_CAIRO_GLYPH
+	$arg = newSVCairoGlyph ($var);
+
+T_CAIRO_PATH
+	$arg = newSVCairoPath ($var);
