@@ -2,7 +2,7 @@
 # this is all hacky etc. it works so it's gonna stay for now. it is not and
 # should not be installed.
 #
-# $Header: /cvs/cairo/cairo-perl/MakeHelper.pm,v 1.2 2005/07/12 20:29:47 tsch Exp $
+# $Header: /cvs/cairo/cairo-perl/MakeHelper.pm,v 1.3 2005/08/31 22:00:15 tsch Exp $
 #
 
 package MakeHelper;
@@ -67,6 +67,7 @@ sub do_typemaps
 	my %objects = %{shift ()};
 	my %structs = %{shift ()};
 	my %enums = %{shift ()};
+	my %backend_macros = %{shift()};
 
 	my $cairo_perl = File::Spec->catfile ($autogen_dir,
 					      'cairo-perl-auto.typemap');
@@ -198,7 +199,13 @@ EOS
 	foreach (keys %objects)
 	{
 		/^(.*) \*/;
+		if (exists $backend_macros{$1}) {
+			print HEADER "#ifdef $backend_macros{$1}\n";
+		}
 		print HEADER "typedef $1 ${1}_noinc;\n";
+		if (exists $backend_macros{$1}) {
+			print HEADER "#endif\n";
+		}
 	}
 
 	close HEADER;

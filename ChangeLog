@@ -1,3 +1,19 @@
+2005/09/01	tsch
+
+	* Cairo.pm, MANIFEST, Makefile.PL, NEWS, README: Release 0.02.
+	Require cairo 1.0.0.
+
+2005/08/31	tsch
+
+	* MakeHelper.pm, Makefile.PL: Surround our _noinc typedefs for the
+	PS and PDF backends with appropriate ifdefs to fix compilation
+	when these backends were not installed with cairo.
+
+2005/08/18	tsch
+
+	* Cairo.pm: Fix incorrect package line that read GStreamer instead
+	of Cairo.
+
 2005/08/15	tsch
 
 	* Cairo.pm, README: Release 0.01.  Also add stub documentation.

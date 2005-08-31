@@ -3,7 +3,7 @@
 #
 # Licensed under the LGPL, see LICENSE file for more information.
 #
-# $Header: /cvs/cairo/cairo-perl/Makefile.PL,v 1.8 2005/08/15 18:59:17 tsch Exp $
+# $Header: /cvs/cairo/cairo-perl/Makefile.PL,v 1.10 2005/08/31 22:32:09 tsch Exp $
 #
 
 use strict;
@@ -23,7 +23,12 @@ our %prereqs = (
 	'ExtUtils::PkgConfig' => 1.0,
 );
 
-my %cairo_cfg = ExtUtils::PkgConfig->find ('cairo >= 0.9.0');
+my %cairo_cfg = ExtUtils::PkgConfig->find ('cairo >= 1.0.0');
+
+my %backend_macros = (
+	'cairo_ps_surface_t' => 'CAIRO_HAS_PS_SURFACE',
+	'cairo_pdf_surface_t' => 'CAIRO_HAS_PDF_SURFACE',
+);
 
 my %objects = (
 	'cairo_t *' => 'Cairo::Context',
@@ -119,6 +124,7 @@ my %enums = (
 			CAIRO_STATUS_INVALID_FORMAT
 			CAIRO_STATUS_INVALID_VISUAL
 			CAIRO_STATUS_FILE_NOT_FOUND
+			CAIRO_STATUS_INVALID_DASH
 	/],
 	cairo_filter_t => [qw/
 			CAIRO_FILTER_
@@ -188,7 +194,8 @@ MakeHelper::write_boot (
 	ignore => '^Cairo$',
 );
 
-my @typemaps = MakeHelper::do_typemaps (\%objects, \%structs, \%enums);
+my @typemaps = MakeHelper::do_typemaps (\%objects, \%structs, \%enums,
+                                        \%backend_macros);
 push @typemaps, 'cairo-perl.typemap';
 
 my $dep = ExtUtils::Depends->new ('Cairo');

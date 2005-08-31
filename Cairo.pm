@@ -3,7 +3,7 @@
 #
 # Licensed under the LGPL, see LICENSE file for more information.
 #
-# $Header: /cvs/cairo/cairo-perl/Cairo.pm,v 1.4 2005/08/15 18:59:17 tsch Exp $
+# $Header: /cvs/cairo/cairo-perl/Cairo.pm,v 1.6 2005/08/31 22:32:09 tsch Exp $
 #
 
 package Cairo;
@@ -14,7 +14,7 @@ use DynaLoader;
 
 our @ISA = qw/DynaLoader/;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 Cairo->bootstrap ($VERSION);
 
@@ -52,7 +52,7 @@ our @ISA = qw/Cairo::Gradient/;
 
 # --------------------------------------------------------------------------- #
 
-package GStreamer;
+package Cairo;
 
 1;
 
