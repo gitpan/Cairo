@@ -3,12 +3,12 @@
 #
 # Licensed under the LGPL, see LICENSE file for more information.
 #
-# $Header: /cvs/cairo/cairo-perl/cairo-perl.typemap,v 1.3 2005/07/29 17:19:55 tsch Exp $
+# $Header: /cvs/cairo/cairo-perl/cairo-perl.typemap,v 1.4 2006/01/08 17:06:29 tsch Exp $
 #
 
 TYPEMAP
 
-cairo_bool_t		T_IV
+cairo_bool_t		T_UV
 
 cairo_font_extents_t *	T_CAIRO_FONT_EXTENTS
 cairo_text_extents_t *	T_CAIRO_TEXT_EXTENTS

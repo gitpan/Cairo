@@ -1,6 +1,6 @@
-# $Header: /cvs/cairo/cairo-perl/README,v 1.4 2005/08/31 22:32:09 tsch Exp $
+# $Header: /cvs/cairo/cairo-perl/README,v 1.5 2006/01/29 19:30:17 tsch Exp $
 
-Cairo version 0.02
+Cairo version 0.03
 ==================
 
 Perl bindings to the cairo graphics library (http://www.cairographics.org).

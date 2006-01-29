@@ -3,7 +3,7 @@
  *
  * Licensed under the LGPL, see LICENSE file for more information.
  *
- * $Header: /cvs/cairo/cairo-perl/CairoPattern.xs,v 1.5 2005/07/12 20:29:47 tsch Exp $
+ * $Header: /cvs/cairo/cairo-perl/CairoPattern.xs,v 1.6 2006/01/29 19:27:21 tsch Exp $
  */
 
 #include <cairo-perl.h>
@@ -25,6 +25,20 @@ cairo_matrix_t * cairo_pattern_get_matrix (cairo_pattern_t * pattern);
 	RETVAL
 
 cairo_status_t cairo_pattern_status (cairo_pattern_t *pattern);
+
+# --------------------------------------------------------------------------- #
+
+MODULE = Cairo::Pattern	PACKAGE = Cairo::SolidPattern	PREFIX = cairo_pattern_
+
+# cairo_pattern_t* cairo_pattern_create_rgb (double red, double green, double blue);
+cairo_solid_pattern_t_noinc * cairo_pattern_create_rgb (class, double red, double green, double blue)
+    C_ARGS:
+	red, green, blue
+
+# cairo_pattern_t* cairo_pattern_create_rgba (double red, double green, double blue, double alpha);
+cairo_solid_pattern_t_noinc * cairo_pattern_create_rgba (class, double red, double green, double blue, double alpha)
+    C_ARGS:
+	red, green, blue, alpha
 
 # --------------------------------------------------------------------------- #
 

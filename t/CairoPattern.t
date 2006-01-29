@@ -3,13 +3,13 @@
 #
 # Licensed under the LGPL, see LICENSE file for more information.
 #
-# $Header: /cvs/cairo/cairo-perl/t/CairoPattern.t,v 1.2 2005/07/12 20:29:49 tsch Exp $
+# $Header: /cvs/cairo/cairo-perl/t/CairoPattern.t,v 1.3 2006/01/29 19:27:21 tsch Exp $
 #
 
 use strict;
 use warnings;
 
-use Test::More tests => 12;
+use Test::More tests => 16;
 
 use constant {
 	IMG_WIDTH => 256,
@@ -18,9 +18,16 @@ use constant {
 
 use Cairo;
 
-my $surf = Cairo::ImageSurface->create ('rgb24', IMG_WIDTH, IMG_HEIGHT);
+my $pat = Cairo::SolidPattern->create_rgb(1.0, 0.0, 0.0);
+isa_ok ($pat, 'Cairo::SolidPattern');
+isa_ok ($pat, 'Cairo::Pattern');
 
-my $pat = Cairo::SurfacePattern->create ($surf);
+$pat = Cairo::SolidPattern->create_rgba(1.0, 0.0, 0.0, 1.0);
+isa_ok ($pat, 'Cairo::SolidPattern');
+isa_ok ($pat, 'Cairo::Pattern');
+
+my $surf = Cairo::ImageSurface->create ('rgb24', IMG_WIDTH, IMG_HEIGHT);
+$pat = Cairo::SurfacePattern->create ($surf);
 isa_ok ($pat, 'Cairo::SurfacePattern');
 isa_ok ($pat, 'Cairo::Pattern');
 

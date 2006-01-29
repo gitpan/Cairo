@@ -3,7 +3,7 @@
 #
 # Licensed under the LGPL, see LICENSE file for more information.
 #
-# $Header: /cvs/cairo/cairo-perl/Makefile.PL,v 1.10 2005/08/31 22:32:09 tsch Exp $
+# $Header: /cvs/cairo/cairo-perl/Makefile.PL,v 1.12 2006/01/29 19:27:21 tsch Exp $
 #
 
 use strict;
@@ -26,23 +26,24 @@ our %prereqs = (
 my %cairo_cfg = ExtUtils::PkgConfig->find ('cairo >= 1.0.0');
 
 my %backend_macros = (
-	'cairo_ps_surface_t' => 'CAIRO_HAS_PS_SURFACE',
+	'cairo_ps_surface_t'  => 'CAIRO_HAS_PS_SURFACE',
 	'cairo_pdf_surface_t' => 'CAIRO_HAS_PDF_SURFACE',
 );
 
 my %objects = (
-	'cairo_t *' => 'Cairo::Context',
-	'cairo_surface_t *' => 'Cairo::Surface',
-	'cairo_image_surface_t *' => 'Cairo::ImageSurface',
-	'cairo_pdf_surface_t *' => 'Cairo::PdfSurface',
-	'cairo_ps_surface_t *' => 'Cairo::PsSurface',
-	'cairo_pattern_t *' => 'Cairo::Pattern',
+	'cairo_t *'                 => 'Cairo::Context',
+	'cairo_surface_t *'         => 'Cairo::Surface',
+	'cairo_image_surface_t *'   => 'Cairo::ImageSurface',
+	'cairo_pdf_surface_t *'     => 'Cairo::PdfSurface',
+	'cairo_ps_surface_t *'      => 'Cairo::PsSurface',
+	'cairo_pattern_t *'         => 'Cairo::Pattern',
+	'cairo_solid_pattern_t *'   => 'Cairo::SolidPattern',
 	'cairo_surface_pattern_t *' => 'Cairo::SurfacePattern',
-	'cairo_gradient_t *' => 'Cairo::Gradient',
+	'cairo_gradient_t *'        => 'Cairo::Gradient',
 	'cairo_linear_gradient_t *' => 'Cairo::LinearGradient',
 	'cairo_radial_gradient_t *' => 'Cairo::RadialGradient',
-	'cairo_font_face_t *' => 'Cairo::FontFace',
-	'cairo_scaled_font_t *' => 'Cairo::ScaledFont',
+	'cairo_font_face_t *'       => 'Cairo::FontFace',
+	'cairo_scaled_font_t *'     => 'Cairo::ScaledFont',
 );
 
 my %structs = (
@@ -208,7 +209,6 @@ $dep->add_typemaps (@typemaps);
 
 $dep->install (qw(cairo-perl.h
                   cairo-perl.typemap
-                  build/cairo-perl-enums.h
                   build/cairo-perl-auto.h
                   build/cairo-perl-auto.typemap));
 $dep->save_config ('build/IFiles.pm');
