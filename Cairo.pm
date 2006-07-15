@@ -1,9 +1,9 @@
 #
-# Copyright (c) 2004-2005 by the cairo perl team (see the file README)
+# Copyright (c) 2004-2006 by the cairo perl team (see the file README)
 #
 # Licensed under the LGPL, see LICENSE file for more information.
 #
-# $Header: /cvs/cairo/cairo-perl/Cairo.pm,v 1.10 2006/01/29 19:30:17 tsch Exp $
+# $Header: /cvs/cairo/cairo-perl/Cairo.pm,v 1.17 2006/07/15 16:05:17 tsch Exp $
 #
 
 package Cairo;
@@ -14,47 +14,11 @@ use DynaLoader;
 
 our @ISA = qw/DynaLoader/;
 
-our $VERSION = '0.03';
+our $VERSION = '0.90';
 
 sub dl_load_flags { $^O eq 'darwin' ? 0x00 : 0x01 }
 
 Cairo->bootstrap ($VERSION);
-
-# --------------------------------------------------------------------------- #
-
-package Cairo::ImageSurface;
-
-our @ISA = qw/Cairo::Surface/;
-
-package Cairo::PdfSurface;
-
-our @ISA = qw/Cairo::Surface/;
-
-package Cairo::PsSurface;
-
-our @ISA = qw/Cairo::Surface/;
-
-# --------------------------------------------------------------------------- #
-
-package Cairo::SolidPattern;
-
-our @ISA = qw/Cairo::Pattern/;
-
-package Cairo::SurfacePattern;
-
-our @ISA = qw/Cairo::Pattern/;
-
-package Cairo::Gradient;
-
-our @ISA = qw/Cairo::Pattern/;
-
-package Cairo::LinearGradient;
-
-our @ISA = qw/Cairo::Gradient/;
-
-package Cairo::RadialGradient;
-
-our @ISA = qw/Cairo::Gradient/;
 
 # --------------------------------------------------------------------------- #
 
@@ -90,13 +54,14 @@ Cairo - Perl interface to the cairo library
 =head1 ABSTRACT
 
 Cairo provides Perl bindings for the vector graphics library cairo.  It
-supports multiple output targets, including the X Window Systems, PDF, and PNG.
-Cairo produces identical output on all those targets and makes use of hardware
-acceleration wherever possible.
+supports multiple output targets, including PNG, PDF and SVG.  Cairo produces
+identical output on all those targets.
 
 =head1 API DOCUMENTATION
 
-=head2 Cairo::Context -- The cairo drawing context
+=head2 Drawing
+
+=head3 Cairo::Context -- The cairo drawing context
 
 I<Cairo::Context> is the main object used when drawing with Cairo. To draw with
 Cairo, you create a I<Cairo::Context>, set the target surface, and drawing
@@ -107,10 +72,9 @@ C<$cr-E<gt>stroke> or C<$cr-E<gt>fill>.
 I<Cairo::Context>'s can be pushed to a stack via C<$cr-E<gt>save>. They may
 then safely be changed, without loosing the current state. Use
 C<$cr-E<gt>restore> to restore to the saved state.
-
 =over
 
-=item $cr = Cairo::Context-E<gt>create ($surface)
+=head4 $cr = Cairo::Context->create ($surface)
 
 =over
 
@@ -118,15 +82,31 @@ C<$cr-E<gt>restore> to restore to the saved state.
 
 =back
 
-=item $cr-E<gt>save
+=head4 $cr-E<gt>save
 
-=item $cr->restore
+=head4 $cr->restore
 
-=item $status = $cr->status
+=head4 $status = $cr->status
 
-=item $surface = $cr->get_target
+=head4 $surface = $cr->get_target
 
-=item $cr->set_source_rgb ($red, $green, $blue)
+=head4 $cr->push_group
+
+=head4 $cr->push_group_with_content ($content)
+
+=over
+
+=item $content: I<Cairo::Content>
+
+=back
+
+=head4 $pattern = $cr->pop_group
+
+=head4 $cr->pop_group_to_source
+
+=head4 $surface = $cr->get_group_target
+
+=head4 $cr->set_source_rgb ($red, $green, $blue)
 
 =over
 
@@ -138,7 +118,7 @@ C<$cr-E<gt>restore> to restore to the saved state.
 
 =back
 
-=item $cr->set_source_rgba ($red, $green, $blue, $alpha)
+=head4 $cr->set_source_rgba ($red, $green, $blue, $alpha)
 
 =over
 
@@ -152,7 +132,7 @@ C<$cr-E<gt>restore> to restore to the saved state.
 
 =back
 
-=item $cr->set_source ($source)
+=head4 $cr->set_source ($source)
 
 =over
 
@@ -160,7 +140,7 @@ C<$cr-E<gt>restore> to restore to the saved state.
 
 =back
 
-=item $cr->set_source_surface ($surface, $x, $y)
+=head4 $cr->set_source_surface ($surface, $x, $y)
 
 =over
 
@@ -172,9 +152,9 @@ C<$cr-E<gt>restore> to restore to the saved state.
 
 =back
 
-=item $source = $cr->get_source ()
+=head4 $source = $cr->get_source
 
-=item $cr->set_antialias ($antialias)
+=head4 $cr->set_antialias ($antialias)
 
 =over
 
@@ -182,9 +162,9 @@ C<$cr-E<gt>restore> to restore to the saved state.
 
 =back
 
-=item $antialias = $cr->get_antialias
+=head4 $antialias = $cr->get_antialias
 
-=item $cr->set_dash ($offset, ...)
+=head4 $cr->set_dash ($offset, ...)
 
 =over
 
@@ -194,7 +174,7 @@ C<$cr-E<gt>restore> to restore to the saved state.
 
 =back
 
-=item $cr->set_fill_rule ($fill_rule)
+=head4 $cr->set_fill_rule ($fill_rule)
 
 =over
 
@@ -202,9 +182,9 @@ C<$cr-E<gt>restore> to restore to the saved state.
 
 =back
 
-=item $cr->fill_rule_t $cr->get_fill_rule
+=head4 $fill_rule = $cr->get_fill_rule
 
-=item $cr->set_line_cap ($line_cap)
+=head4 $cr->set_line_cap ($line_cap)
 
 =over
 
@@ -212,9 +192,9 @@ C<$cr-E<gt>restore> to restore to the saved state.
 
 =back
 
-=item $line_cap = $cr->get_line_cap
+=head4 $line_cap = $cr->get_line_cap
 
-=item $cr->set_line_join ($line_join)
+=head4 $cr->set_line_join ($line_join)
 
 =over
 
@@ -222,9 +202,9 @@ C<$cr-E<gt>restore> to restore to the saved state.
 
 =back
 
-=item $line_join = $cr->get_line_join
+=head4 $line_join = $cr->get_line_join
 
-=item $cr->set_line_width ($width)
+=head4 $cr->set_line_width ($width)
 
 =over
 
@@ -232,9 +212,9 @@ C<$cr-E<gt>restore> to restore to the saved state.
 
 =back
 
-=item $width = $cr->get_line_width
+=head4 $width = $cr->get_line_width
 
-=item $cr->set_miter_limit ($ limit)
+=head4 $cr->set_miter_limit ($ limit)
 
 =over
 
@@ -242,9 +222,9 @@ C<$cr-E<gt>restore> to restore to the saved state.
 
 =back
 
-=item $limit = $cr->get_miter_limit
+=head4 $limit = $cr->get_miter_limit
 
-=item $cr->set_operator ($op)
+=head4 $cr->set_operator ($op)
 
 =over
 
@@ -252,9 +232,9 @@ C<$cr-E<gt>restore> to restore to the saved state.
 
 =back
 
-=item $op = $cr->get_operator
+=head4 $op = $cr->get_operator
 
-=item $cr->set_tolerance ($tolerance)
+=head4 $cr->set_tolerance ($tolerance)
 
 =over
 
@@ -262,21 +242,21 @@ C<$cr-E<gt>restore> to restore to the saved state.
 
 =back
 
-=item $tolerance = $cr->get_tolerance
+=head4 $tolerance = $cr->get_tolerance
 
-=item $cr->clip
+=head4 $cr->clip
 
-=item $cr->clip_preserve
+=head4 $cr->clip_preserve
 
-=item $cr->reset_clip
+=head4 $cr->reset_clip
 
-=item $cr->fill
+=head4 $cr->fill
 
-=item $cr->fill_preserve
+=head4 $cr->fill_preserve
 
-=item ($x1, $y1, $x2, $y2) = $cr->fill_extents
+=head4 ($x1, $y1, $x2, $y2) = $cr->fill_extents
 
-=item $bool = $cr->in_fill ($x, $y)
+=head4 $bool = $cr->in_fill ($x, $y)
 
 =over
 
@@ -286,7 +266,7 @@ C<$cr-E<gt>restore> to restore to the saved state.
 
 =back
 
-=item $cr->mask ($pattern)
+=head4 $cr->mask ($pattern)
 
 =over
 
@@ -294,7 +274,7 @@ C<$cr-E<gt>restore> to restore to the saved state.
 
 =back
 
-=item $cr->mask_surface ($surface, $surface_x, $surface_y)
+=head4 $cr->mask_surface ($surface, $surface_x, $surface_y)
 
 =over
 
@@ -306,9 +286,9 @@ C<$cr-E<gt>restore> to restore to the saved state.
 
 =back
 
-=item $cr->paint
+=head4 $cr->paint
 
-=item $cr->paint_with_alpha ($alpha)
+=head4 $cr->paint_with_alpha ($alpha)
 
 =over
 
@@ -316,13 +296,13 @@ C<$cr-E<gt>restore> to restore to the saved state.
 
 =back
 
-=item $cr->stroke
+=head4 $cr->stroke
 
-=item $cr->stroke_preserve
+=head4 $cr->stroke_preserve
 
-=item ($x1, $y1, $x2, $y2) = $cr->stroke_extents
+=head4 ($x1, $y1, $x2, $y2) = $cr->stroke_extents
 
-=item $bool = $cr->in_stroke ($x, $y)
+=head4 $bool = $cr->in_stroke ($x, $y)
 
 =over
 
@@ -332,17 +312,15 @@ C<$cr-E<gt>restore> to restore to the saved state.
 
 =back
 
-=item $cr->copy_page
+=head4 $cr->copy_page
 
-=item $cr->show_page
-
-=back
+=head4 $cr->show_page
 
 =cut
 
 # --------------------------------------------------------------------------- #
 
-=head2 Paths -- Creating paths and manipulating path data
+=head3 Paths -- Creating paths and manipulating path data
 
   $path = [
     { type => "move-to", points => [[1, 2]] },
@@ -394,13 +372,11 @@ The semantics and ordering of the coordinate values are consistent with
 C<$cr-E<gt>move_to>, C<$cr-E<gt>line_to>, C<$cr-E<gt>curve_to>, and
 C<$cr-E<gt>close_path>.
 
-=over
+=head4 $path = $cr->copy_path
 
-=item $path = $cr->copy_path
+=head4 $path = $cr->copy_path_flat
 
-=item $path = $cr->copy_path_flat
-
-=item $cr->append_path ($path)
+=head4 $cr->append_path ($path)
 
 =over
 
@@ -408,29 +384,15 @@ C<$cr-E<gt>close_path>.
 
 =back
 
-=item ($x, $y) = $cr->get_current_point
+=head4 ($x, $y) = $cr->get_current_point
 
-=item $cr->new_path
+=head4 $cr->new_path
 
-=item $cr->close_path
+=head4 $cr->new_sub_path
 
-=item $cr->arc ($xc, $yc, $radius, $angle1, $angle2)
+=head4 $cr->close_path
 
-=over
-
-=item $xc: double
-
-=item $yc: double
-
-=item $radius: double
-
-=item $angle1: double
-
-=item $angle2: double
-
-=back
-
-=item $cr->arc_negative ($xc, $yc, $radius, $angle1, $angle2)
+=head4 $cr->arc ($xc, $yc, $radius, $angle1, $angle2)
 
 =over
 
@@ -446,7 +408,23 @@ C<$cr-E<gt>close_path>.
 
 =back
 
-=item $cr->curve_to ($x1, $y1, $x2, $y2, $x3, $y3)
+=head4 $cr->arc_negative ($xc, $yc, $radius, $angle1, $angle2)
+
+=over
+
+=item $xc: double
+
+=item $yc: double
+
+=item $radius: double
+
+=item $angle1: double
+
+=item $angle2: double
+
+=back
+
+=head4 $cr->curve_to ($x1, $y1, $x2, $y2, $x3, $y3)
 
 =over
 
@@ -464,7 +442,7 @@ C<$cr-E<gt>close_path>.
 
 =back
 
-=item $cr->line_to ($x, $y)
+=head4 $cr->line_to ($x, $y)
 
 =over
 
@@ -474,7 +452,7 @@ C<$cr-E<gt>close_path>.
 
 =back
 
-=item $cr->move_to ($x, $y)
+=head4 $cr->move_to ($x, $y)
 
 =over
 
@@ -484,7 +462,7 @@ C<$cr-E<gt>close_path>.
 
 =back
 
-=item $cr->rectangle ($x, $y, $width, $height)
+=head4 $cr->rectangle ($x, $y, $width, $height)
 
 =over
 
@@ -498,7 +476,7 @@ C<$cr-E<gt>close_path>.
 
 =back
 
-=item $cr->glyph_path (...)
+=head4 $cr->glyph_path (...)
 
 =over
 
@@ -506,7 +484,7 @@ C<$cr-E<gt>close_path>.
 
 =back
 
-=item $cr->text_path ($utf8)
+=head4 $cr->text_path ($utf8)
 
 =over
 
@@ -514,7 +492,7 @@ C<$cr-E<gt>close_path>.
 
 =back
 
-=item $cr->rel_curve_to ($dx1, $dy1, $dx2, $dy2, $dx3, $dy3)
+=head4 $cr->rel_curve_to ($dx1, $dy1, $dx2, $dy2, $dx3, $dy3)
 
 =over
 
@@ -532,7 +510,7 @@ C<$cr-E<gt>close_path>.
 
 =back
 
-=item $cr->rel_line_to ($dx, $dy)
+=head4 $cr->rel_line_to ($dx, $dy)
 
 =over
 
@@ -542,15 +520,13 @@ C<$cr-E<gt>close_path>.
 
 =back
 
-=item $cr->rel_move_to ($dx, $dy)
+=head4 $cr->rel_move_to ($dx, $dy)
 
 =over
 
 =item $dx: double
 
 =item $dy: double
-
-=back
 
 =back
 
@@ -558,13 +534,13 @@ C<$cr-E<gt>close_path>.
 
 # --------------------------------------------------------------------------- #
 
-=head2 Patterns -- Gradients and filtered sources
+=head3 Patterns -- Gradients and filtered sources
 
-=over
+=head4 $status = $pattern->status
 
-=item $status = $pattern->status
+=head4 $type = $pattern->get_type
 
-=item $pattern->set_matrix ($matrix)
+=head4 $pattern->set_matrix ($matrix)
 
 =over
 
@@ -572,9 +548,9 @@ C<$cr-E<gt>close_path>.
 
 =back
 
-=item $matrix = $pattern->get_matrix
+=head4 $matrix = $pattern->get_matrix
 
-=item $pattern = Cairo::SolidPattern->create_rgb ($red, $green, $blue)
+=head4 $pattern = Cairo::SolidPattern->create_rgb ($red, $green, $blue)
 
 =over
 
@@ -586,7 +562,7 @@ C<$cr-E<gt>close_path>.
 
 =back
 
-=item $pattern = Cairo::SolidPattern->create_rgba ($red, $green, $blue, $alpha)
+=head4 $pattern = Cairo::SolidPattern->create_rgba ($red, $green, $blue, $alpha)
 
 =over
 
@@ -600,9 +576,9 @@ C<$cr-E<gt>close_path>.
 
 =back
 
-=item $matrix = $pattern->get_matrix
+=head4 $matrix = $pattern->get_matrix
 
-=item $pattern = Cairo::SurfacePattern->create ($surface)
+=head4 $pattern = Cairo::SurfacePattern->create ($surface)
 
 =over
 
@@ -610,7 +586,7 @@ C<$cr-E<gt>close_path>.
 
 =back
 
-=item $pattern->set_extend ($extend)
+=head4 $pattern->set_extend ($extend)
 
 =over
 
@@ -618,9 +594,9 @@ C<$cr-E<gt>close_path>.
 
 =back
 
-=item $extend = $pattern->get_extend
+=head4 $extend = $pattern->get_extend
 
-=item $pattern->set_filter ($filter)
+=head4 $pattern->set_filter ($filter)
 
 =over
 
@@ -628,9 +604,9 @@ C<$cr-E<gt>close_path>.
 
 =back
 
-=item $filter = $pattern->get_filter
+=head4 $filter = $pattern->get_filter
 
-=item $pattern = Cairo::LinearGradient->create ($x0, $y0, $x1, $y1)
+=head4 $pattern = Cairo::LinearGradient->create ($x0, $y0, $x1, $y1)
 
 =over
 
@@ -644,7 +620,7 @@ C<$cr-E<gt>close_path>.
 
 =back
 
-=item $pattern = Cairo::RadialGradient->create ($cx0, $cy0, $radius0, $cx1, $cy1, $radius1)
+=head4 $pattern = Cairo::RadialGradient->create ($cx0, $cy0, $radius0, $cx1, $cy1, $radius1)
 
 =over
 
@@ -662,7 +638,7 @@ C<$cr-E<gt>close_path>.
 
 =back
 
-=item $pattern->add_color_stop_rgb (double offset, double red, double green, double blue)
+=head4 $pattern->add_color_stop_rgb (double offset, double red, double green, double blue)
 
 =over
 
@@ -676,7 +652,7 @@ C<$cr-E<gt>close_path>.
 
 =back
 
-=item $pattern->add_color_stop_rgba (double offset, double red, double green, double blue, double alpha)
+=head4 $pattern->add_color_stop_rgba (double offset, double red, double green, double blue, double alpha)
 
 =over
 
@@ -692,17 +668,13 @@ C<$cr-E<gt>close_path>.
 
 =back
 
-=back
-
 =cut
 
 # --------------------------------------------------------------------------- #
 
-=head2 Transformations -- Manipulating the current transformation matrix
+=head3 Transformations -- Manipulating the current transformation matrix
 
-=over
-
-=item $cr->translate ($tx, $ty)
+=head4 $cr->translate ($tx, $ty)
 
 =over
 
@@ -712,7 +684,7 @@ C<$cr-E<gt>close_path>.
 
 =back
 
-=item $cr->scale ($sx, $sy)
+=head4 $cr->scale ($sx, $sy)
 
 =over
 
@@ -722,7 +694,7 @@ C<$cr-E<gt>close_path>.
 
 =back
 
-=item $cr->rotate ($angle)
+=head4 $cr->rotate ($angle)
 
 =over
 
@@ -730,7 +702,7 @@ C<$cr-E<gt>close_path>.
 
 =back
 
-=item $cr->transform ($matrix)
+=head4 $cr->transform ($matrix)
 
 =over
 
@@ -738,7 +710,7 @@ C<$cr-E<gt>close_path>.
 
 =back
 
-=item $cr->set_matrix ($matrix)
+=head4 $cr->set_matrix ($matrix)
 
 =over
 
@@ -746,11 +718,11 @@ C<$cr-E<gt>close_path>.
 
 =back
 
-=item $matrix = $cr->get_matrix
+=head4 $matrix = $cr->get_matrix
 
-=item $cr->identity_matrix
+=head4 $cr->identity_matrix
 
-=item ($x, $y) = $cr->user_to_device ($x, $y)
+=head4 ($x, $y) = $cr->user_to_device ($x, $y)
 
 =over
 
@@ -760,7 +732,7 @@ C<$cr-E<gt>close_path>.
 
 =back
 
-=item ($dx, $dy) = $cr->user_to_device_distance ($dx, $dy)
+=head4 ($dx, $dy) = $cr->user_to_device_distance ($dx, $dy)
 
 =over
 
@@ -770,7 +742,7 @@ C<$cr-E<gt>close_path>.
 
 =back
 
-=item ($x, $y) = $cr->device_to_user ($x, $y)
+=head4 ($x, $y) = $cr->device_to_user ($x, $y)
 
 =over
 
@@ -780,15 +752,13 @@ C<$cr-E<gt>close_path>.
 
 =back
 
-=item ($dx, $dy) = $cr->device_to_user_distance ($dx, $dy)
+=head4 ($dx, $dy) = $cr->device_to_user_distance ($dx, $dy)
 
 =over
 
 =item $dx: double
 
 =item $dy: double
-
-=back
 
 =back
 
@@ -796,7 +766,7 @@ C<$cr-E<gt>close_path>.
 
 # --------------------------------------------------------------------------- #
 
-=head2 Text -- Rendering text and sets of glyphs
+=head3 Text -- Rendering text and sets of glyphs
 
 Glyphs are represented as anonymous hash references with three keys: I<index>,
 I<x> and I<y>.  Example:
@@ -805,9 +775,7 @@ I<x> and I<y>.  Example:
                 { index => 2, x => 3, y => 4 },
                 { index => 3, x => 4, y => 5 });
 
-=over
-
-=item $cr->select_font_face ($family, $slant, $weight)
+=head4 $cr->select_font_face ($family, $slant, $weight)
 
 =over
 
@@ -819,7 +787,7 @@ I<x> and I<y>.  Example:
 
 =back
 
-=item $cr->set_font_size ($size)
+=head4 $cr->set_font_size ($size)
 
 =over
 
@@ -827,7 +795,7 @@ I<x> and I<y>.  Example:
 
 =back
 
-=item $cr->set_font_matrix ($matrix)
+=head4 $cr->set_font_matrix ($matrix)
 
 =over
 
@@ -835,9 +803,9 @@ I<x> and I<y>.  Example:
 
 =back
 
-=item $matrix = $cr->get_font_matrix
+=head4 $matrix = $cr->get_font_matrix
 
-=item $cr->set_font_options ($options)
+=head4 $cr->set_font_options ($options)
 
 =over
 
@@ -845,9 +813,17 @@ I<x> and I<y>.  Example:
 
 =back
 
-=item $options = $cr->get_font_options
+=head4 $options = $cr->get_font_options
 
-=item $cr->show_text ($utf8)
+=head4 $cr->set_scaled_font ($scaled_font)
+
+=over
+
+=item $scaled_font: I<Cairo::ScaledFont>
+
+=back
+
+=head4 $cr->show_text ($utf8)
 
 =over
 
@@ -855,7 +831,7 @@ I<x> and I<y>.  Example:
 
 =back
 
-=item $cr->show_glyphs (...)
+=head4 $cr->show_glyphs (...)
 
 =over
 
@@ -863,11 +839,11 @@ I<x> and I<y>.  Example:
 
 =back
 
-=item $face = $cr->get_font_face
+=head4 $face = $cr->get_font_face
 
-=item $extents = $cr->font_extents
+=head4 $extents = $cr->font_extents
 
-=item $cr->set_font_face ($font_face)
+=head4 $cr->set_font_face ($font_face)
 
 =over
 
@@ -875,7 +851,15 @@ I<x> and I<y>.  Example:
 
 =back
 
-=item $extents = $cr->text_extents ($utf8)
+=head4 $cr->set_scaled_font ($scaled_font)
+
+=over
+
+=item $scaled_font: I<Cairo::ScaledFont>
+
+=back
+
+=head4 $extents = $cr->text_extents ($utf8)
 
 =over
 
@@ -883,13 +867,167 @@ I<x> and I<y>.  Example:
 
 =back
 
-=item $extents = $cr->glyph_extents (...)
+=head4 $extents = $cr->glyph_extents (...)
 
 =over
 
 =item ...: list of glyphs
 
 =back
+
+=cut
+
+# --------------------------------------------------------------------------- #
+
+=head2 Fonts
+
+=head3 Cairo::FontFace -- Base class for fonts
+
+=head4 $status = $font_face->status
+
+=head4 $type = $font_face->get_type
+
+=cut
+
+# --------------------------------------------------------------------------- #
+
+=head3 Scaled Fonts -- Caching metrics for a particular font size
+
+=head4 $scaled_font = Cairo::ScaledFont->create ($font_face, $font_matrix, $ctm, $options)
+
+=over
+
+=item $font_face: I<Cairo::FontFace>
+
+=item $font_matrix: I<Cairo::Matrix>
+
+=item $ctm: I<Cairo::Matrix>
+
+=item $options: I<Cairo::FontOptions>
+
+=back
+
+=head4 $status = $scaled_font->status
+
+=head4 $extents = $scaled_font->extents
+
+=head4 $extents = $scaled_font->text_extents ($utf8)
+
+=over
+
+=item $utf8: string
+
+=back
+
+=head4 $extents = $scaled_font->glyph_extents (...)
+
+=over
+
+=item ...: list of glyphs
+
+=back
+
+=head4 $font_face = $scaled_font->get_font_face
+
+=head4 $options = $scaled_font->get_font_options
+
+=head4 $font_matrix = $scaled_font->get_font_matrix
+
+=head4 $ctm = $scaled_font->get_ctm
+
+=head4 $type = $scaled_font->get_type
+
+=cut
+
+# --------------------------------------------------------------------------- #
+
+=head3 Font Options -- How a font should be rendered
+
+=head4 $font_options = Cairo::FontOptions->create
+
+=head4 $status = $font_options->status
+
+=head4 $font_options->merge ($other)
+
+=over
+
+=item $other: I<Cairo::FontOptions>
+
+=back
+
+=head4 $hash = $font_options->hash
+
+=head4 $bools = $font_options->equal ($other)
+
+=over
+
+=item $other: I<Cairo::FontOptions>
+
+=back
+
+=head4 $font_options->set_antialias ($antialias)
+
+=over
+
+=item $antialias: I<Cairo::AntiAlias>
+
+=back
+
+=head4 $antialias = $font_options->get_antialias
+
+=head4 $font_options->set_subpixel_order ($subpixel_order)
+
+=over
+
+=item $subpixel_order: I<Cairo::SubpixelOrder>
+
+=back
+
+=head4 $subpixel_order = $font_options->get_subpixel_order
+
+=head4 $font_options->set_hint_style ($hint_style)
+
+=over
+
+=item $hint_style: I<Cairo::HintStyle>
+
+=back
+
+=head4 $hint_style = $font_options->get_hint_style
+
+=head4 $font_options->set_hint_metrics ($hint_metrics)
+
+=over
+
+=item $hint_metrics: I<Cairo::HintMetrics>
+
+=back
+
+=head4 $hint_metrics = $font_options->get_hint_metrics
+
+=cut
+
+# --------------------------------------------------------------------------- #
+
+=head2 Utilities
+
+=head3 Version Information -- Run-time and compile-time version checks.
+
+=head4 $version = Cairo->version
+
+=head4 $string = Cairo->version_string
+
+=head4 $version_code = Cairo->VERSION
+
+=head4 $version_code = Cairo->VERSION_ENCODE ($major, $minor, $micro)
+
+=over
+
+=item $major: integer
+
+=item $minor: integer
+
+=item $micro: integer
 
 =back
 
@@ -923,6 +1061,6 @@ Contains the reference manual
 
 =head1 COPYRIGHT
 
-Copyright (C) 2005 by the cairo perl team
+Copyright (C) 2004-2006 by the cairo perl team
 
 =cut

@@ -3,50 +3,75 @@
  *
  * Licensed under the LGPL, see LICENSE file for more information.
  *
- * $Header: /cvs/cairo/cairo-perl/CairoMatrix.xs,v 1.5 2005/07/12 20:29:47 tsch Exp $
+ * $Header: /cvs/cairo/cairo-perl/CairoMatrix.xs,v 1.7 2006/05/14 13:43:10 tsch Exp $
  */
 
 #include <cairo-perl.h>
+
+cairo_matrix_t *
+cairo_perl_copy_matrix (cairo_matrix_t *src)
+{
+	cairo_matrix_t *dst = malloc (sizeof (cairo_matrix_t));
+
+	dst->xx = src->xx;
+	dst->xy = src->xy;
+	dst->x0 = src->x0;
+	dst->yx = src->yx;
+	dst->yy = src->yy;
+	dst->y0 = src->y0;
+
+	return dst;
+}
 
 MODULE = Cairo::Matrix	PACKAGE = Cairo::Matrix PREFIX = cairo_matrix_
 
 ##void cairo_matrix_init (cairo_matrix_t *matrix, double xx, double yx, double xy, double yy, double x0, double y0);
 cairo_matrix_t * cairo_matrix_init (class, double xx, double yx, double xy, double yy, double x0, double y0)
+    PREINIT:
+	cairo_matrix_t matrix;
     CODE:
-	RETVAL = malloc (sizeof (cairo_matrix_t));
-	cairo_matrix_init (RETVAL, xx, yx, xy, yy, x0, y0);
+	cairo_matrix_init (&matrix, xx, yx, xy, yy, x0, y0);
+	RETVAL = cairo_perl_copy_matrix (&matrix);
     OUTPUT:
 	RETVAL
 
 ##void cairo_matrix_init_identity (cairo_matrix_t *matrix);
 cairo_matrix_t * cairo_matrix_init_identity (class)
+    PREINIT:
+	cairo_matrix_t matrix;
     CODE:
-	RETVAL = malloc (sizeof (cairo_matrix_t));
-	cairo_matrix_init_identity (RETVAL);
+	cairo_matrix_init_identity (&matrix);
+	RETVAL = cairo_perl_copy_matrix (&matrix);
     OUTPUT:
 	RETVAL
 
 ##void cairo_matrix_init_translate (cairo_matrix_t *matrix, double tx, double ty);
 cairo_matrix_t * cairo_matrix_init_translate (class, double tx, double ty)
+    PREINIT:
+	cairo_matrix_t matrix;
     CODE:
-	RETVAL = malloc (sizeof (cairo_matrix_t));
-	cairo_matrix_init_translate (RETVAL, tx, ty);
+	cairo_matrix_init_translate (&matrix, tx, ty);
+	RETVAL = cairo_perl_copy_matrix (&matrix);
     OUTPUT:
 	RETVAL
 
 ##void cairo_matrix_init_scale (cairo_matrix_t *matrix, double sx, double sy);
 cairo_matrix_t * cairo_matrix_init_scale (class, double sx, double sy)
+    PREINIT:
+	cairo_matrix_t matrix;
     CODE:
-	RETVAL = malloc (sizeof (cairo_matrix_t));
-	cairo_matrix_init_scale (RETVAL, sx, sy);
+	cairo_matrix_init_scale (&matrix, sx, sy);
+	RETVAL = cairo_perl_copy_matrix (&matrix);
     OUTPUT:
 	RETVAL
 
 ##void cairo_matrix_init_rotate (cairo_matrix_t *matrix, double radians);
 cairo_matrix_t * cairo_matrix_init_rotate (class, double radians)
+    PREINIT:
+	cairo_matrix_t matrix;
     CODE:
-	RETVAL = malloc (sizeof (cairo_matrix_t));
-	cairo_matrix_init_rotate (RETVAL, radians);
+	cairo_matrix_init_rotate (&matrix, radians);
+	RETVAL = cairo_perl_copy_matrix (&matrix);
     OUTPUT:
 	RETVAL
 
@@ -59,10 +84,12 @@ void cairo_matrix_rotate (cairo_matrix_t * matrix, double radians);
 cairo_status_t cairo_matrix_invert (cairo_matrix_t * matrix);
 
 ##void cairo_matrix_multiply (cairo_matrix_t * result, const cairo_matrix_t * a, const cairo_matrix_t * b);
-cairo_matrix_t * cairo_matrix_multiply (cairo_matrix_t * a, cairo_matrix_t * b);
+cairo_matrix_t * cairo_matrix_multiply (cairo_matrix_t * a, cairo_matrix_t * b)
+    PREINIT:
+	cairo_matrix_t matrix;
     CODE:
-	RETVAL = malloc (sizeof (cairo_matrix_t));
-	cairo_matrix_multiply (RETVAL, a, b);
+	cairo_matrix_multiply (&matrix, a, b);
+	RETVAL = cairo_perl_copy_matrix (&matrix);
     OUTPUT:
 	RETVAL
 

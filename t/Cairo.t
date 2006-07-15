@@ -3,13 +3,13 @@
 #
 # Licensed under the LGPL, see LICENSE file for more information.
 #
-# $Header: /cvs/cairo/cairo-perl/t/Cairo.t,v 1.6 2005/08/10 17:01:54 tsch Exp $
+# $Header: /cvs/cairo/cairo-perl/t/Cairo.t,v 1.8 2006/06/03 14:21:10 tsch Exp $
 #
 
 use strict;
 use warnings;
 
-use Test::More tests => 50;
+use Test::More tests => 56;
 
 use constant {
 	IMG_WIDTH => 256,
@@ -20,6 +20,12 @@ BEGIN {
 	use_ok ('Cairo');
 }
 
+ok(defined Cairo::version);
+ok(defined Cairo::version_string);
+
+ok(defined Cairo->version);
+ok(defined Cairo->version_string);
+
 my $surf = Cairo::ImageSurface->create ('rgb24', IMG_WIDTH, IMG_HEIGHT);
 isa_ok ($surf, 'Cairo::Surface');
 
@@ -28,6 +34,13 @@ isa_ok ($cr, 'Cairo::Context');
 
 $cr->save;
 $cr->restore;
+
+$cr->push_group();
+isa_ok ($cr->get_group_target, 'Cairo::Surface');
+isa_ok ($cr->pop_group(), 'Cairo::Pattern');
+
+$cr->push_group_with_content('color');
+$cr->pop_group_to_source();
 
 $cr->set_operator ('clear');
 is ($cr->get_operator, 'clear');
@@ -82,6 +95,7 @@ is_deeply ([$cr->device_to_user (23, 42)], [23, 42]);
 is_deeply ([$cr->device_to_user_distance (1, 2)], [1, 2]);
 
 $cr->new_path;
+$cr->new_sub_path;
 $cr->move_to (1.1, 2.2);
 $cr->line_to (2.2, 3.3);
 $cr->curve_to (3.3, 4.4, 5.5, 6.6, 7.7, 8.8);
@@ -159,6 +173,12 @@ foreach $ext ($cr->text_extents ('Urgs?'),
 
 $cr->text_path ('Urgs?');
 $cr->glyph_path (@glyphs);
+
+my $options = Cairo::FontOptions->create;
+my $matrix = Cairo::Matrix->init_identity;
+my $ctm = Cairo::Matrix->init_identity;
+my $font = Cairo::ScaledFont->create ($face, $matrix, $ctm, $options);
+$cr->set_scaled_font ($font);
 
 isa_ok ($cr->get_source, 'Cairo::Pattern');
 

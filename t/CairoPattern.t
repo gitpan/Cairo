@@ -3,13 +3,13 @@
 #
 # Licensed under the LGPL, see LICENSE file for more information.
 #
-# $Header: /cvs/cairo/cairo-perl/t/CairoPattern.t,v 1.3 2006/01/29 19:27:21 tsch Exp $
+# $Header: /cvs/cairo/cairo-perl/t/CairoPattern.t,v 1.4 2006/05/07 14:17:39 tsch Exp $
 #
 
 use strict;
 use warnings;
 
-use Test::More tests => 16;
+use Test::More tests => 17;
 
 use constant {
 	IMG_WIDTH => 256,
@@ -55,3 +55,4 @@ $pat->set_matrix ($matrix);
 isa_ok ($pat->get_matrix, 'Cairo::Matrix');
 
 is ($pat->status, 'success');
+is ($pat->get_type, 'radial');

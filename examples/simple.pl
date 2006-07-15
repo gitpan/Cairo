@@ -1,14 +1,14 @@
 #!/usr/bin/perl
 
 #
-# $Header: /cvs/cairo/cairo-perl/examples/simple.pl,v 1.2 2005/07/12 20:29:49 tsch Exp $
+# $Header: /cvs/cairo/cairo-perl/examples/simple.pl,v 1.3 2006/06/03 14:21:10 tsch Exp $
 #
 
 use strict;
 use warnings;
 use Cairo;
 
-use constant 
+use constant
 {
 	IMG_WIDTH => 640,
 	IMG_HEIGHT => 480,
