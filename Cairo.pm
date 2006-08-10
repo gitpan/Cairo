@@ -3,7 +3,7 @@
 #
 # Licensed under the LGPL, see LICENSE file for more information.
 #
-# $Header: /cvs/cairo/cairo-perl/Cairo.pm,v 1.17 2006/07/15 16:05:17 tsch Exp $
+# $Header: /cvs/cairo/cairo-perl/Cairo.pm,v 1.18 2006/08/10 18:27:31 tsch Exp $
 #
 
 package Cairo;
@@ -14,7 +14,7 @@ use DynaLoader;
 
 our @ISA = qw/DynaLoader/;
 
-our $VERSION = '0.90';
+our $VERSION = '0.91';
 
 sub dl_load_flags { $^O eq 'darwin' ? 0x00 : 0x01 }
 

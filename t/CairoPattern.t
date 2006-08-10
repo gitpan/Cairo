@@ -3,7 +3,7 @@
 #
 # Licensed under the LGPL, see LICENSE file for more information.
 #
-# $Header: /cvs/cairo/cairo-perl/t/CairoPattern.t,v 1.4 2006/05/07 14:17:39 tsch Exp $
+# $Header: /cvs/cairo/cairo-perl/t/CairoPattern.t,v 1.5 2006/08/10 17:34:40 tsch Exp $
 #
 
 use strict;
@@ -55,4 +55,10 @@ $pat->set_matrix ($matrix);
 isa_ok ($pat->get_matrix, 'Cairo::Matrix');
 
 is ($pat->status, 'success');
-is ($pat->get_type, 'radial');
+
+SKIP: {
+	skip 'new stuff', 1
+		unless Cairo::VERSION >= Cairo::VERSION_ENCODE (1, 2, 0);
+
+	is ($pat->get_type, 'radial');
+}
