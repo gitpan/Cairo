@@ -1,3 +1,27 @@
+2006-08-15	tsch
+
+	* Cairo.pm, MANIFEST, NEWS, README: Beta release 0.92.
+
+2006-08-13	tsch
+
+	* CairoSurface.xs (read_func_marshaller): Use POPs, SvPV, and
+	sv_len instead of POPpx to avoid problems on perl 5.8.8 reported
+	by Joe Smith and Alexey Tourbin.
+
+2006-08-11	tsch
+
+	* examples/png-streams.pl: New example that demonstrates how to
+	use the PNG stream functions.
+
+	* t/CairoSurface.t: Whitespace fix.
+
+2006-08-11	tsch
+
+	* CairoSurface.xs: Patch from Yaakov S puts version guards around
+	a few PDF and PS functions that appeared in 1.2.0.
+
+	* t/CairoSurface.t: Do the same for the corresponding tests.
+
 2006-08-10	tsch
 
 	* Cairo.pm, NEWS, README: Beta release 0.91.
