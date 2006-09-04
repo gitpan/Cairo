@@ -3,7 +3,7 @@
 #
 # Licensed under the LGPL, see LICENSE file for more information.
 #
-# $Header: /cvs/cairo/cairo-perl/Cairo.pm,v 1.19 2006/08/15 14:06:47 tsch Exp $
+# $Header: /cvs/cairo/cairo-perl/Cairo.pm,v 1.20 2006/09/04 15:38:05 tsch Exp $
 #
 
 package Cairo;
@@ -14,7 +14,7 @@ use DynaLoader;
 
 our @ISA = qw/DynaLoader/;
 
-our $VERSION = '0.92';
+our $VERSION = '1.00';
 
 sub dl_load_flags { $^O eq 'darwin' ? 0x00 : 0x01 }
 
@@ -58,6 +58,9 @@ supports multiple output targets, including PNG, PDF and SVG.  Cairo produces
 identical output on all those targets.
 
 =head1 API DOCUMENTATION
+
+Note that this listing still lacks entries for I<Cairo::Surface>s and some
+utility methods.
 
 =head2 Drawing
 

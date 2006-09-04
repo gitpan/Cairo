@@ -3,7 +3,7 @@
 #
 # Licensed under the LGPL, see LICENSE file for more information.
 #
-# $Header: /cvs/cairo/cairo-perl/Makefile.PL,v 1.18 2006/08/10 17:34:40 tsch Exp $
+# $Header: /cvs/cairo/cairo-perl/Makefile.PL,v 1.20 2006/08/27 12:42:32 tsch Exp $
 #
 
 use strict;
@@ -53,7 +53,7 @@ $MakeHelper::autogen_dir = $autogen_dir;
 
 my %cairo_cfg = ExtUtils::PkgConfig->find ("cairo >= $extreqs{cairo}");
 
-my %backend_macros = (
+my %backend_guards = (
 	'cairo_pdf_surface_t' => 'CAIRO_HAS_PDF_SURFACE',
 	'cairo_ps_surface_t'  => 'CAIRO_HAS_PS_SURFACE',
 	'cairo_svg_surface_t' => 'CAIRO_HAS_SVG_SURFACE',
@@ -268,7 +268,11 @@ if ($have_cairo_1_2) {
 	$enums{cairo_svg_version_t} = [];
 }
 
-MakeHelper::do_enums (\%enums);
+my %enum_guards = (
+	cairo_svg_version_t => $backend_guards{cairo_svg_surface_t},
+);
+
+MakeHelper::do_enums (\%enums, \%enum_guards);
 
 my @xs_files = <*.xs>;
 
@@ -278,7 +282,7 @@ MakeHelper::write_boot (
 );
 
 my @typemaps = MakeHelper::do_typemaps (\%objects, \%structs, \%enums,
-                                        \%backend_macros);
+                                        \%backend_guards, \%enum_guards);
 push @typemaps, 'cairo-perl.typemap';
 
 my $dep = ExtUtils::Depends->new ('Cairo');
@@ -295,12 +299,29 @@ $dep->install (qw(cairo-perl.h
                   build/cairo-perl-auto.typemap));
 $dep->save_config ('build/IFiles.pm');
 
+my @exports = qw(
+	cairo_object_from_sv
+	cairo_object_to_sv
+	cairo_struct_from_sv
+	cairo_struct_to_sv
+	newSVCairoFontExtents
+	newSVCairoTextExtents
+	newSVCairoGlyph
+	SvCairoGlyph
+	newSVCairoPath
+	SvCairoPath
+	cairo_surface_to_sv
+	cairo_pattern_to_sv
+);
+
 WriteMakefile (
 	NAME          => 'Cairo',
 	VERSION_FROM  => 'Cairo.pm',
 	ABSTRACT_FROM => 'Cairo.pm',
 	PREREQ_PM     => \%prereqs,
 	XSPROTOARG    => '-noprototypes',
+	FUNCLIST      => \@exports,
+	DL_FUNCS      => { Cairo=> [] },
 	$dep->get_makefile_vars,
 );
 

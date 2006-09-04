@@ -2,7 +2,7 @@
 # this is all hacky etc. it works so it's gonna stay for now. it is not and
 # should not be installed.
 #
-# $Header: /cvs/cairo/cairo-perl/MakeHelper.pm,v 1.7 2006/08/10 17:34:40 tsch Exp $
+# $Header: /cvs/cairo/cairo-perl/MakeHelper.pm,v 1.9 2006/08/20 18:33:22 tsch Exp $
 #
 
 package MakeHelper;
@@ -71,7 +71,8 @@ sub do_typemaps
 	my %objects = %{shift ()};
 	my %structs = %{shift ()};
 	my %enums = %{shift ()};
-	my %backend_macros = %{shift ()};
+	my %backend_guards = %{shift ()};
+	my %enum_guards = %{shift ()};
 
 	my $cairo_perl = File::Spec->catfile ($autogen_dir,
 					      'cairo-perl-auto.typemap');
@@ -198,8 +199,8 @@ EOS
 		my $mangled = mangle ($type);
 		my $ref = reference ($type);
 
-		if (exists $backend_macros{$type}) {
-			print HEADER "#ifdef $backend_macros{$type}\n";
+		if (exists $backend_guards{$type}) {
+			print HEADER "#ifdef $backend_guards{$type}\n";
 		}
 
 		print HEADER <<"EOS";
@@ -212,8 +213,8 @@ typedef $type ${type}_ornull;
 #define newSV${mangled}_ornull(object)	(((object) == NULL) ? &PL_sv_undef : newSV$mangled(object))
 EOS
 
-		if (exists $backend_macros{$type}) {
-			print HEADER "#endif /* $backend_macros{$type} */\n";
+		if (exists $backend_guards{$type}) {
+			print HEADER "#endif /* $backend_guards{$type} */\n";
 		}
 	}
 
@@ -240,11 +241,16 @@ EOS
 
 	print HEADER "\n/* enums */\n\n";
 
-	foreach (keys %enums)
+	foreach my $type (keys %enums)
 	{
-		my $type = $_;
 		my $mangled = mangle ($type);
 		my $name = name ($type);
+
+		next unless @{$enums{$type}};
+
+		if (exists $enum_guards{$type}) {
+			print HEADER "#ifdef $enum_guards{$type}\n";
+		}
 
 		print HEADER <<"EOS";
 int cairo_${name}_from_sv (SV * $name);
@@ -252,6 +258,10 @@ SV * cairo_${name}_to_sv (int val);
 #define Sv$mangled(sv)		(cairo_${name}_from_sv (sv))
 #define newSV$mangled(val)	(cairo_${name}_to_sv (val))
 EOS
+
+		if (exists $enum_guards{$type}) {
+			print HEADER "#endif /* $enum_guards{$type} */\n";
+		}
 	}
 
 	close HEADER;
@@ -264,6 +274,7 @@ EOS
 sub do_enums
 {
 	my %enums = %{shift ()};
+        my %guards = %{shift ()};
 
 	my $cairo_enums = 'cairo-perl-enums.c';
 	open ENUMS, '>', $cairo_enums
@@ -341,36 +352,20 @@ EOS
 		$str;
 	}
 
-	foreach (keys %enums)
+	foreach my $type (keys %enums)
 	{
-		my $name = name($_);
-		my @enum_values = @{$enums{$_}};
+		my $name = name($type);
+		my @enum_values = @{$enums{$type}};
 
-		# Create stub converters to make xsubpp happy even if the
-		# current cairo doesn't have this type
-		unless (@enum_values) {
-			print ENUMS <<"EOS";
-int
-cairo_${name}_from_sv (SV * $name)
-{
-	return 0;
-}
+		next unless @enum_values;
 
-SV *
-cairo_${name}_to_sv (int val)
-{
-	return &PL_sv_undef;
-}
-
-EOS
-
-			# Skip to next enum value
-			next;
-		}
-
-		my $value_list = join ", ", map { canonicalize($_, $enum_values[0]) } @enum_values[1..$#enum_values];
+		my $value_list = join ", ", map { canonicalize($type, $enum_values[0]) } @enum_values[1..$#enum_values];
 		my $tree_from = if_tree_from (@enum_values);
 		my $tree_to = if_tree_to (@enum_values);
+
+		if (exists $guards{$type}) {
+			print ENUMS "#ifdef $guards{$type}\n\n";
+		}
 
 		print ENUMS <<"EOS";
 int
@@ -379,7 +374,7 @@ cairo_${name}_from_sv (SV * $name)
 	char * str = SvPV_nolen ($name);
 
 	$tree_from
-	croak ("`%s' is not a valid $_ value; valid values are: $value_list", str);
+	croak ("`%s' is not a valid $type value; valid values are: $value_list", str);
 
 	return 0;
 }
@@ -388,11 +383,15 @@ SV *
 cairo_${name}_to_sv (int val)
 {
 	$tree_to
-	warn ("unknown $_ value %d encountered", val);
+	warn ("unknown $type value %d encountered", val);
 	return &PL_sv_undef;
 }
 
 EOS
+
+		if (exists $guards{$type}) {
+			print ENUMS "#endif /* $guards{$type} */\n";
+		}
 	}
 
 	close ENUMS;

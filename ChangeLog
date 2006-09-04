@@ -1,3 +1,26 @@
+2006-09-04	tsch
+
+	* Cairo.pm, NEWS, README: Stable release 1.00.
+
+2006-08-27	tsch
+
+	* Makefile.PL: Make EU::MM export our symbols on Win32.
+
+2006-08-20	tsch
+
+	* MakeHelper.pm: Revert the last commit which used real enum types
+	instead of int; it broke compilation.  Also alter the way unknown
+	enum types are dealt with: don't declare and implement stub
+	converters, just omit them.  Still declare typemaps for them
+	though, to make xsubpp happy.
+
+2006-08-20	tsch
+
+	* MakeHelper.pm: Add the infrastructure necessary to support
+	protecting the enum related things with #ifdef, if needed.  Also
+	use the real enum types for the enum converters, instead of just
+	int.
+
 2006-08-15	tsch
 
 	* Cairo.pm, MANIFEST, NEWS, README: Beta release 0.92.
