@@ -3,7 +3,7 @@
  *
  * Licensed under the LGPL, see LICENSE file for more information.
  *
- * $Header: /cvs/cairo/cairo-perl/CairoSurface.xs,v 1.16 2006/08/13 18:53:26 tsch Exp $
+ * $Header: /cvs/cairo/cairo-perl/CairoSurface.xs,v 1.17 2006/09/24 12:20:43 tsch Exp $
  */
 
 #include <cairo-perl.h>
@@ -55,7 +55,7 @@ cairo_perl_package_table_lookup (void *pointer)
 	return NULL;
 }
 
-#endif
+#endif /* !1.2.0 */
 
 static const char *
 get_package (cairo_surface_t *surface)
@@ -169,7 +169,7 @@ write_func_marshaller (void *closure,
                        unsigned int length)
 {
 	CairoPerlCallback *callback;
-	cairo_status_t status;
+	cairo_status_t status = CAIRO_STATUS_SUCCESS;
 	dCAIRO_PERL_CALLBACK_MARSHAL_SP;
 
 	callback = (CairoPerlCallback *) closure;
@@ -188,7 +188,9 @@ write_func_marshaller (void *closure,
 	call_sv (callback->func, G_DISCARD | G_EVAL);
 	SPAGAIN;
 
-	status = SvTRUE (ERRSV) ? SvCairoStatus (ERRSV) : CAIRO_STATUS_SUCCESS;
+	if (SvTRUE (ERRSV)) {
+		status = SvCairoStatus (ERRSV);
+	}
 
 	PUTBACK;
 	FREETMPS;
