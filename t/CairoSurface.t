@@ -3,13 +3,13 @@
 #
 # Licensed under the LGPL, see LICENSE file for more information.
 #
-# $Header: /cvs/cairo/cairo-perl/t/CairoSurface.t,v 1.16 2006/09/24 21:13:15 tsch Exp $
+# $Header: /cvs/cairo/cairo-perl/t/CairoSurface.t,v 1.17 2006/11/09 18:44:49 tsch Exp $
 #
 
 use strict;
 use warnings;
 
-use Test::More tests => 60;
+use Test::More tests => 62;
 
 use constant {
 	IMG_WIDTH => 256,
@@ -49,6 +49,15 @@ SKIP: {
 $surf = $surf->create_similar ('color', IMG_WIDTH, IMG_HEIGHT);
 isa_ok ($surf, 'Cairo::ImageSurface');
 isa_ok ($surf, 'Cairo::Surface');
+
+# Test that the enum wrappers differentiate between color and color-alpha.
+# Duh!
+{
+	my $tmp = $surf->create_similar ('color-alpha', IMG_WIDTH, IMG_HEIGHT);
+	is ($tmp->get_content, 'color-alpha');
+	$tmp = $surf->create_similar ('color', IMG_WIDTH, IMG_HEIGHT);
+	is ($tmp->get_content, 'color');
+}
 
 $surf->set_device_offset (23, 42);
 

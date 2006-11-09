@@ -2,7 +2,7 @@
 # this is all hacky etc. it works so it's gonna stay for now. it is not and
 # should not be installed.
 #
-# $Header: /cvs/cairo/cairo-perl/MakeHelper.pm,v 1.9 2006/08/20 18:33:22 tsch Exp $
+# $Header: /cvs/cairo/cairo-perl/MakeHelper.pm,v 1.10 2006/11/09 18:44:49 tsch Exp $
 #
 
 package MakeHelper;
@@ -306,7 +306,10 @@ sub do_enums
 
 		my $full = shift @enums;
 		my $name = canonicalize($full, $prefix);
-		my $len = length ($name);
+
+		# +1 so that strncmp also looks at the trailing \0, and discerns
+		# 'color' and 'color-alpha', for example.
+		my $len = length ($name) + 1;
 
 		my $str = <<"EOS";
 	if (strncmp (str, "$name", $len) == 0)

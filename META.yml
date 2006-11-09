@@ -1,12 +1,13 @@
-# http://module-build.sourceforge.net/META-spec.html
-#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
-name:         Cairo
-version:      1.01
-version_from: Cairo.pm
-installdirs:  site
-requires:
+--- #YAML:1.0
+name:                Cairo
+version:             1.02
+abstract:            Perl interface to the cairo library
+license:             ~
+generated_by:        ExtUtils::MakeMaker version 6.31
+distribution_type:   module
+requires:     
     ExtUtils::Depends:             0.2
     ExtUtils::PkgConfig:           1
-
-distribution_type: module
-generated_by: ExtUtils::MakeMaker version 6.30
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
+    version: 1.2
