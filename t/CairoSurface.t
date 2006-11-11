@@ -3,7 +3,7 @@
 #
 # Licensed under the LGPL, see LICENSE file for more information.
 #
-# $Header: /cvs/cairo/cairo-perl/t/CairoSurface.t,v 1.17 2006/11/09 18:44:49 tsch Exp $
+# $Header: /cvs/cairo/cairo-perl/t/CairoSurface.t,v 1.17.2.1 2006/11/11 20:04:23 tsch Exp $
 #
 
 use strict;
@@ -52,7 +52,10 @@ isa_ok ($surf, 'Cairo::Surface');
 
 # Test that the enum wrappers differentiate between color and color-alpha.
 # Duh!
-{
+SKIP: {
+	skip 'content tests', 2
+		unless Cairo::VERSION >= Cairo::VERSION_ENCODE (1, 2, 0);
+
 	my $tmp = $surf->create_similar ('color-alpha', IMG_WIDTH, IMG_HEIGHT);
 	is ($tmp->get_content, 'color-alpha');
 	$tmp = $surf->create_similar ('color', IMG_WIDTH, IMG_HEIGHT);
