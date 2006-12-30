@@ -2,7 +2,7 @@
 # this is all hacky etc. it works so it's gonna stay for now. it is not and
 # should not be installed.
 #
-# $Header: /cvs/cairo/cairo-perl/MakeHelper.pm,v 1.10 2006/11/09 18:44:49 tsch Exp $
+# $Header: /cvs/cairo/cairo-perl/MakeHelper.pm,v 1.10.2.1 2006/12/30 19:17:05 tsch Exp $
 #
 
 package MakeHelper;
@@ -362,7 +362,7 @@ EOS
 
 		next unless @enum_values;
 
-		my $value_list = join ", ", map { canonicalize($type, $enum_values[0]) } @enum_values[1..$#enum_values];
+		my $value_list = join ", ", map { canonicalize($_, $enum_values[0]) } @enum_values[1..$#enum_values];
 		my $tree_from = if_tree_from (@enum_values);
 		my $tree_to = if_tree_to (@enum_values);
 

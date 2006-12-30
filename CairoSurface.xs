@@ -3,7 +3,7 @@
  *
  * Licensed under the LGPL, see LICENSE file for more information.
  *
- * $Header: /cvs/cairo/cairo-perl/CairoSurface.xs,v 1.17 2006/09/24 12:20:43 tsch Exp $
+ * $Header: /cvs/cairo/cairo-perl/CairoSurface.xs,v 1.17.2.1 2006/11/23 19:13:01 tsch Exp $
  */
 
 #include <cairo-perl.h>
@@ -343,9 +343,12 @@ SV *
 cairo_image_surface_get_data (cairo_surface_t *surface)
     PREINIT:
 	unsigned char *data;
+	int height, stride;
     CODE:
 	data = cairo_image_surface_get_data (surface);
-	RETVAL = data ? newSVpv ((char *) data, 0) : &PL_sv_undef;
+	height = cairo_image_surface_get_height (surface);
+	stride = cairo_image_surface_get_stride (surface);
+	RETVAL = data ? newSVpv ((char *) data, height * stride) : &PL_sv_undef;
     OUTPUT:
 	RETVAL
 
