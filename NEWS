@@ -1,13 +1,26 @@
-Overview of changes in Cairo 1.023
+Overview of changes in Cairo 1.040
 ==================================
 
-* Fix a test failure related to endianness.
+* Re-add Cairo::Surface::finish.
+* Add support for cairo_get_scaled_font.
+* Document the new API.
 
-Overview of changes in Cairo 1.022
+Overview of changes in Cairo 1.031
 ==================================
 
+* Track upstream API improvements.
+* Fix enum error messages to display the correct list of allowed values.
+* Fix a endianness-related test failure.
+
+Overview of changes in Cairo 1.030
+==================================
+
+* Add support for new API:
+  - cairo_get_dash, cairo_copy_clip_rectangles, and cairo_clip_extents.
+  - cairo_pattern_get_rgba, cairo_pattern_get_surface,
+    cairo_pattern_get_color_stop_rgba, cairo_pattern_get_points, and
+    cairo_pattern_get_circles.
 * Make Cairo::ImageSurface::get_data usable.
-* Fix the valid-value lists in enum error messages.
 
 Overview of changes in Cairo 1.021
 ==================================

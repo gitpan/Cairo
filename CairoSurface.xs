@@ -3,7 +3,7 @@
  *
  * Licensed under the LGPL, see LICENSE file for more information.
  *
- * $Header: /cvs/cairo/cairo-perl/CairoSurface.xs,v 1.17.2.1 2006/11/23 19:13:01 tsch Exp $
+ * $Header: /cvs/cairo/cairo-perl/CairoSurface.xs,v 1.19 2007/03/17 16:13:32 tsch Exp $
  */
 
 #include <cairo-perl.h>
@@ -256,6 +256,8 @@ cairo_surface_t_noinc * cairo_surface_create_similar (cairo_surface_t * other, c
 	cairo_perl_package_table_insert (RETVAL, package ? package : "Cairo::Surface");
     }
 #endif
+
+void cairo_surface_finish (cairo_surface_t *surface);
 
 cairo_status_t cairo_surface_status (cairo_surface_t *surface);
 

@@ -3,13 +3,13 @@
 #
 # Licensed under the LGPL, see LICENSE file for more information.
 #
-# $Header: /cvs/cairo/cairo-perl/t/Cairo.t,v 1.9 2006/08/10 17:34:40 tsch Exp $
+# $Header: /cvs/cairo/cairo-perl/t/Cairo.t,v 1.14 2007/05/06 11:28:37 tsch Exp $
 #
 
 use strict;
 use warnings;
 
-use Test::More tests => 56;
+use Test::More tests => 68;
 
 use constant {
 	IMG_WIDTH => 256,
@@ -77,6 +77,22 @@ $cr->set_line_join ('miter');
 is ($cr->get_line_join, 'miter');
 
 $cr->set_dash (0, 2, 4, 6, 4, 2);
+$cr->set_dash (0);
+
+SKIP: {
+	skip 'new stuff', 4
+		unless Cairo::VERSION >= Cairo::VERSION_ENCODE (1, 4, 0);
+
+	$cr->set_dash (0.5, 2.3, 4.5, 6.7, 4.5, 2.3);
+	my ($offset, @dashes) = $cr->get_dash;
+	is ($offset, 0.5);
+	is_deeply (\@dashes, [2.3, 4.5, 6.7, 4.5, 2.3]);
+
+	$cr->set_dash (0);
+	($offset, @dashes) = $cr->get_dash;
+	is ($offset, 0);
+	is_deeply (\@dashes, []);
+}
 
 $cr->set_miter_limit (2.2);
 is ($cr->get_miter_limit, 2.2);
@@ -142,6 +158,26 @@ is (@ext, 4);
 $cr->clip;
 $cr->clip_preserve;
 $cr->reset_clip;
+
+SKIP: {
+	skip 'new stuff', 7
+		unless Cairo::VERSION >= Cairo::VERSION_ENCODE (1, 4, 0);
+
+	$cr->rectangle (0, 0, 128, 128);
+	$cr->clip;
+
+	my @extents = $cr->clip_extents;
+	is (@extents, 4);
+	is ($extents[0], 0);
+	is ($extents[1], 0);
+	is ($extents[2], 128);
+	is ($extents[3], 128);
+
+	my @list = $cr->copy_clip_rectangle_list;
+	is (@list, 1);
+	is_deeply ($list[0], { x => 0, y => 0, width => 128, height => 128 });
+}
+
 $cr->select_font_face ('Sans', 'normal', 'normal');
 $cr->set_font_size (12);
 
@@ -195,6 +231,13 @@ SKIP: {
 	my $ctm = Cairo::Matrix->init_identity;
 	my $font = Cairo::ScaledFont->create ($face, $matrix, $ctm, $options);
 	$cr->set_scaled_font ($font);
+}
+
+SKIP: {
+	skip 'new stuff', 1
+		unless Cairo::VERSION >= Cairo::VERSION_ENCODE (1, 4, 0);
+
+	isa_ok ($cr->get_scaled_font, 'Cairo::ScaledFont');
 }
 
 isa_ok ($cr->get_source, 'Cairo::Pattern');

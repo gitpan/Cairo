@@ -3,7 +3,7 @@
 #
 # Licensed under the LGPL, see LICENSE file for more information.
 #
-# $Header: /cvs/cairo/cairo-perl/Makefile.PL,v 1.20 2006/08/27 12:42:32 tsch Exp $
+# $Header: /cvs/cairo/cairo-perl/Makefile.PL,v 1.23 2007/05/06 11:28:37 tsch Exp $
 #
 
 use strict;
@@ -207,7 +207,10 @@ my %enums = (
 	/],
 );
 
+# --------------------------------------------------------------------------- #
+
 my $have_cairo_1_2 = ExtUtils::PkgConfig->atleast_version("cairo", "1.2.0");
+my $have_cairo_1_4 = ExtUtils::PkgConfig->atleast_version("cairo", "1.4.0");
 
 if ($have_cairo_1_2) {
 	my %new = (
@@ -268,6 +271,21 @@ if ($have_cairo_1_2) {
 	$enums{cairo_svg_version_t} = [];
 }
 
+if ($have_cairo_1_4) {
+	my %new = (
+		cairo_status_t => [qw/CAIRO_STATUS_INVALID_INDEX
+		                      CAIRO_STATUS_CLIP_NOT_REPRESENTABLE/],
+	);
+
+	foreach my $enum (keys %new) {
+		foreach my $value (@{$new{$enum}}) {
+			push @{$enums{$enum}}, $value;
+		}
+	}
+}
+
+# --------------------------------------------------------------------------- #
+
 my %enum_guards = (
 	cairo_svg_version_t => $backend_guards{cairo_svg_surface_t},
 );
@@ -295,6 +313,7 @@ $dep->add_typemaps (@typemaps);
 
 $dep->install (qw(cairo-perl.h
                   cairo-perl.typemap
+                  doctypes
                   build/cairo-perl-auto.h
                   build/cairo-perl-auto.typemap));
 $dep->save_config ('build/IFiles.pm');

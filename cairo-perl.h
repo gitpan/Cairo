@@ -3,7 +3,7 @@
  *
  * Licensed under the LGPL, see LICENSE file for more information.
  *
- * $Header: /cvs/cairo/cairo-perl/cairo-perl.h,v 1.10 2006/07/15 14:41:11 tsch Exp $
+ * $Header: /cvs/cairo/cairo-perl/cairo-perl.h,v 1.12 2007/05/06 11:28:37 tsch Exp $
  *
  */
 
@@ -46,15 +46,21 @@ SV *cairo_struct_to_sv (void *object, const char *package);
 /*
  * custom struct handling
  */
-SV * newSVCairoFontExtents (cairo_font_extents_t * extents);
+SV * newSVCairoFontExtents (cairo_font_extents_t *extents);
 
-SV * newSVCairoTextExtents (cairo_text_extents_t * extents);
+SV * newSVCairoTextExtents (cairo_text_extents_t *extents);
 
-SV * newSVCairoGlyph (cairo_glyph_t * glyph);
-cairo_glyph_t * SvCairoGlyph (SV * sv);
+SV * newSVCairoGlyph (cairo_glyph_t *glyph);
+cairo_glyph_t * SvCairoGlyph (SV *sv);
 
-SV * newSVCairoPath (cairo_path_t * path);
-cairo_path_t * SvCairoPath (SV * sv);
+SV * newSVCairoPath (cairo_path_t *path);
+cairo_path_t * SvCairoPath (SV *sv);
+
+#if CAIRO_VERSION >= CAIRO_VERSION_ENCODE(1, 4, 0)
+
+SV * newSVCairoRectangle (cairo_rectangle_t *rectangle);
+
+#endif
 
 /*
  * special treatment for surfaces

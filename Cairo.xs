@@ -3,7 +3,7 @@
  *
  * Licensed under the LGPL, see LICENSE file for more information.
  *
- * $Header: /cvs/cairo/cairo-perl/Cairo.xs,v 1.14 2006/08/10 17:34:40 tsch Exp $
+ * $Header: /cvs/cairo/cairo-perl/Cairo.xs,v 1.20 2007/05/06 11:28:37 tsch Exp $
  *
  */
 
@@ -26,23 +26,6 @@ call_xs (pTHX_ void (*subaddr) (pTHX_ CV *), CV * cv, SV ** mark)
 		extern XS(name);				\
 		call_xs (aTHX_ name, cv, mark);	\
 	}
-
-/* ------------------------------------------------------------------------- */
-
-#define DOUBLES_DECLARE	\
-	int i, n; double * pts;
-#define DOUBLES_SLURP_FROM_STACK(first)				\
-	n = (items - first);					\
-	pts = (double*)malloc (sizeof (double) * n);		\
-	if (!pts)						\
-		croak ("malloc failure for (%d) elements", n);	\
-	for (i = first ; i < items ; i++) {			\
-		pts[i-first] = SvIV (ST (i));			\
-	}
-#define DOUBLES_LEN	n
-#define DOUBLES_ARRAY	pts
-#define DOUBLES_CLEANUP	\
-	free (pts);
 
 /* ------------------------------------------------------------------------- */
 
@@ -104,7 +87,7 @@ cairo_struct_to_sv (void *object, const char *package)
 /* ------------------------------------------------------------------------- */
 
 SV *
-newSVCairoFontExtents (cairo_font_extents_t * extents)
+newSVCairoFontExtents (cairo_font_extents_t *extents)
 {
 	HV *hv;
 	double value;
@@ -135,7 +118,7 @@ newSVCairoFontExtents (cairo_font_extents_t * extents)
 /* ------------------------------------------------------------------------- */
 
 SV *
-newSVCairoTextExtents (cairo_text_extents_t * extents)
+newSVCairoTextExtents (cairo_text_extents_t *extents)
 {
 	HV *hv;
 	double value;
@@ -169,8 +152,8 @@ newSVCairoTextExtents (cairo_text_extents_t * extents)
 /* ------------------------------------------------------------------------- */
 
 /* taken from Glib/Glib.xs */
-static void *
-alloc_temp (int nbytes)
+void *
+cairo_perl_alloc_temp (int nbytes)
 {
 	dTHR;
 	SV * s;
@@ -183,7 +166,7 @@ alloc_temp (int nbytes)
 }
 
 SV *
-newSVCairoGlyph (cairo_glyph_t * glyph)
+newSVCairoGlyph (cairo_glyph_t *glyph)
 {
 	HV *hv;
 	unsigned long index;
@@ -207,7 +190,7 @@ newSVCairoGlyph (cairo_glyph_t * glyph)
 }
 
 cairo_glyph_t *
-SvCairoGlyph (SV * sv)
+SvCairoGlyph (SV *sv)
 {
 	HV *hv;
 	SV **value;
@@ -217,7 +200,7 @@ SvCairoGlyph (SV * sv)
 		croak ("cairo_glyph_t must be a hash reference");
 
 	hv = (HV *) SvRV (sv);
-	glyph = alloc_temp (sizeof (cairo_glyph_t));
+	glyph = cairo_perl_alloc_temp (sizeof (cairo_glyph_t));
 
 	value = hv_fetch (hv, "index", 5, 0);
 	if (value && SvOK (*value))
@@ -236,7 +219,37 @@ SvCairoGlyph (SV * sv)
 
 /* ------------------------------------------------------------------------- */
 
+#if CAIRO_VERSION >= CAIRO_VERSION_ENCODE(1, 4, 0)
+
+SV *
+newSVCairoRectangle (cairo_rectangle_t *rectangle)
+{
+	HV *hv;
+
+	if (!rectangle)
+		return &PL_sv_undef;
+
+	hv = newHV ();
+
+	hv_store (hv, "x", 1, newSVnv (rectangle->x), 0);
+	hv_store (hv, "y", 1, newSVnv (rectangle->y), 0);
+	hv_store (hv, "width", 5, newSVnv (rectangle->width), 0);
+	hv_store (hv, "height", 6, newSVnv (rectangle->height), 0);
+
+	return newRV_noinc ((SV *) hv);
+}
+
+#endif
+
+/* ------------------------------------------------------------------------- */
+
 MODULE = Cairo	PACKAGE = Cairo	PREFIX = cairo_
+
+BOOT:
+#include "cairo-perl-boot.xsh"
+#if CAIRO_PERL_DEBUG
+	call_atexit ((ATEXIT_t) cairo_debug_reset_static_data, NULL);
+#endif
 
 int VERSION (class=NULL)
     CODE:
@@ -277,9 +290,6 @@ const char* cairo_version_string (class=NULL)
 # ---------------------------------------------------------------------------- #
 
 MODULE = Cairo	PACKAGE = Cairo::Context	PREFIX = cairo_
-
-BOOT:
-#include "cairo-perl-boot.xsh"
 
 cairo_t_noinc * cairo_create (class, cairo_surface_t * target);
     C_ARGS:
@@ -328,14 +338,27 @@ void cairo_set_line_cap (cairo_t * cr, cairo_line_cap_t line_cap);
 void cairo_set_line_join (cairo_t * cr, cairo_line_join_t line_join);
 
 ##void cairo_set_dash (cairo_t * cr, double * dashes, int ndash, double offset);
-void cairo_set_dash (cairo_t * cr, double offset, dash1, ...)
+void cairo_set_dash (cairo_t * cr, double offset, ...)
     PREINIT:
-	DOUBLES_DECLARE
+	int i, n;
+	double *pts;
     CODE:
-	DOUBLES_SLURP_FROM_STACK (2)
-	cairo_set_dash (cr, DOUBLES_ARRAY, DOUBLES_LEN, offset);
+#define FIRST 2
+	n = (items - FIRST);
+	if (n == 0) {
+		pts = NULL;
+	} else {
+		pts = malloc (sizeof (double) * n);
+		if (!pts)
+			croak ("malloc failure for (%d) elements", n);
+		for (i = FIRST ; i < items ; i++)
+			pts[i - FIRST] = SvNV (ST (i));
+	}
+#undef FIRST
+	cairo_set_dash (cr, pts, n, offset);
     CLEANUP:
-	DOUBLES_CLEANUP
+	if (pts)
+		free (pts);
 
 void cairo_set_miter_limit (cairo_t * cr, double limit);
 
@@ -419,6 +442,25 @@ void cairo_clip (cairo_t * cr);
 
 void cairo_clip_preserve (cairo_t *cr);
 
+#if CAIRO_VERSION >= CAIRO_VERSION_ENCODE(1, 4, 0)
+
+##cairo_rectangle_list_t * cairo_copy_clip_rectangle_list (cairo_t *cr);
+void cairo_copy_clip_rectangle_list (cairo_t *cr)
+    PREINIT:
+	cairo_rectangle_list_t *list;
+	int i;
+    PPCODE:
+	list = cairo_copy_clip_rectangle_list (cr);
+	CAIRO_PERL_CHECK_STATUS (list->status);
+	EXTEND (sp, list->num_rectangles);
+	for (i = 0; i < list->num_rectangles; i++)
+		PUSHs (sv_2mortal (newSVCairoRectangle (&(list->rectangles[i]))));
+	cairo_rectangle_list_destroy (list);
+
+void cairo_clip_extents (cairo_t *cr, OUTLIST double x1, OUTLIST double y1, OUTLIST double x2, OUTLIST double y2);
+
+#endif
+
 void cairo_reset_clip (cairo_t *cr);
 
 void cairo_select_font_face (cairo_t *cr, const char *family, cairo_font_slant_t slant, cairo_font_weight_t weight);
@@ -450,6 +492,12 @@ cairo_font_options_t * cairo_get_font_options (cairo_t *cr)
 #if CAIRO_VERSION >= CAIRO_VERSION_ENCODE(1, 2, 0)
 
 void cairo_set_scaled_font (cairo_t *cr, const cairo_scaled_font_t *scaled_font);
+
+#endif
+
+#if CAIRO_VERSION >= CAIRO_VERSION_ENCODE(1, 4, 0)
+
+cairo_scaled_font_t * cairo_get_scaled_font (cairo_t *cr);
 
 #endif
 
@@ -543,6 +591,32 @@ cairo_line_cap_t cairo_get_line_cap (cairo_t *cr);
 cairo_line_join_t cairo_get_line_join (cairo_t *cr);
 
 double cairo_get_miter_limit (cairo_t *cr);
+
+#if CAIRO_VERSION >= CAIRO_VERSION_ENCODE(1, 4, 0)
+
+## int cairo_get_dash_count (cairo_t *cr);
+## void cairo_get_dash (cairo_t *cr, double *dashes, double *offset);
+void cairo_get_dash (cairo_t *cr)
+    PREINIT:
+	int count, i;
+	double *dashes, offset;
+    PPCODE:
+	count = cairo_get_dash_count (cr);
+	if (count == 0) {
+		dashes = NULL;
+	} else {
+		dashes = malloc (sizeof (double) * count);
+		if (!dashes)
+			croak ("malloc failure for (%d) elements", count);
+	}
+	cairo_get_dash (cr, dashes, &offset);
+	EXTEND (sp, count + 1);
+	PUSHs (sv_2mortal (newSVnv (offset)));
+	for (i = 0; i < count; i++)
+		PUSHs (sv_2mortal (newSVnv (dashes[i])));
+	free (dashes);
+
+#endif
 
 ##void cairo_get_matrix (cairo_t *cr, cairo_matrix_t *matrix);
 cairo_matrix_t * cairo_get_matrix (cairo_t *cr)

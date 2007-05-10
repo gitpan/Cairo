@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-# $Id: png-streams.pl,v 1.1 2006/08/11 18:51:46 tsch Exp $
+# $Id: png-streams.pl,v 1.2 2007/03/17 16:13:32 tsch Exp $
 
 use strict;
 use warnings;
@@ -18,7 +18,7 @@ my $surface = Cairo::ImageSurface->create_from_png_stream (sub {
   my $buffer;
 
   if ($length != sysread ($rfh, $buffer, $length)) {
-  	die 'read-error';
+    die 'read-error';
   }
 
   return $buffer;
