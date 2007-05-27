@@ -3,7 +3,7 @@
 #
 # Licensed under the LGPL, see LICENSE file for more information.
 #
-# $Header: /cvs/cairo/cairo-perl/t/CairoSurface.t,v 1.21 2007/05/10 19:01:13 tsch Exp $
+# $Header: /cvs/cairo/cairo-perl/t/CairoSurface.t,v 1.22 2007/05/27 12:34:20 tsch Exp $
 #
 
 use strict;
@@ -247,9 +247,12 @@ SKIP: {
 
 
 	SKIP: {
-		# FIXME: Re-enable this once the bug is fixed upstream.
 		skip 'create_for_stream on ps surfaces', 4
-			unless 0; # Cairo::VERSION >= Cairo::VERSION_ENCODE (1, 2, 0);
+			unless Cairo::VERSION >= Cairo::VERSION_ENCODE (1, 2, 0);
+
+		skip 'create_for_stream on ps surfaces', 4
+			if (Cairo::VERSION() >= Cairo::VERSION_ENCODE (1, 4, 0) &&
+			    Cairo::VERSION() < Cairo::VERSION_ENCODE (1, 4, 8));
 
 		$surf = Cairo::PsSurface->create_for_stream (sub {
 			my ($closure, $data) = @_;
@@ -276,9 +279,9 @@ SKIP: {
 	unlink 'tmp.svg';
 
 	SKIP: {
-		# FIXME: Re-enable this once the bug is fixed upstream.
 		skip 'create_for_stream on svg surfaces', 4
-			unless 0;
+			if (Cairo::VERSION() >= Cairo::VERSION_ENCODE (1, 4, 0) &&
+			    Cairo::VERSION() < Cairo::VERSION_ENCODE (1, 4, 8));
 
 		$surf = Cairo::SvgSurface->create_for_stream (sub {
 			my ($closure, $data) = @_;

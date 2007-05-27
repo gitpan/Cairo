@@ -3,7 +3,7 @@
 #
 # Licensed under the LGPL, see LICENSE file for more information.
 #
-# $Header: /cvs/cairo/cairo-perl/Makefile.PL,v 1.23 2007/05/06 11:28:37 tsch Exp $
+# $Header: /cvs/cairo/cairo-perl/Makefile.PL,v 1.24 2007/05/13 10:58:05 tsch Exp $
 #
 
 use strict;
@@ -46,6 +46,9 @@ while ((my $module, my $version) = each(%prereqs)) {
 	}
 	eval "use $module $version; 1" or die $@;
 }
+
+# Add this now since it's not required to generate a Makefile.
+$prereqs{'Test::Number::Delta'} = 1.00;
 
 my $autogen_dir = 'build';
 mkdir $autogen_dir unless (-d $autogen_dir);
