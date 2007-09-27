@@ -1,3 +1,22 @@
+2007-09-27	tsch
+
+	* Cairo.pm
+	* NEWS
+	* README: Stable release 1.042.
+
+2007-09-27	tsch
+
+	* Makefile.PL: Make missing prerequisites fatal.
+
+2007-09-09	tsch
+
+	* cairo-perl.typemap: Add const char * for backwards
+	compatibility.
+
+2007-08-13	tsch
+
+	* doctypes: Add missing type names.
+
 2007-05-27	tsch
 
 	* Cairo.pm, NEWS, README: Stable release 1.041.

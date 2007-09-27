@@ -3,7 +3,7 @@
 #
 # Licensed under the LGPL, see LICENSE file for more information.
 #
-# $Header: /cvs/cairo/cairo-perl/Makefile.PL,v 1.24 2007/05/13 10:58:05 tsch Exp $
+# $Header: /cvs/cairo/cairo-perl/Makefile.PL,v 1.25 2007-09-27 20:23:40 tsch Exp $
 #
 
 use strict;
@@ -341,6 +341,7 @@ WriteMakefile (
 	VERSION_FROM  => 'Cairo.pm',
 	ABSTRACT_FROM => 'Cairo.pm',
 	PREREQ_PM     => \%prereqs,
+	PREREQ_FATAL  => 1,
 	XSPROTOARG    => '-noprototypes',
 	FUNCLIST      => \@exports,
 	DL_FUNCS      => { Cairo=> [] },

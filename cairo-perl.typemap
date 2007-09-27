@@ -3,10 +3,14 @@
 #
 # Licensed under the LGPL, see LICENSE file for more information.
 #
-# $Header: /cvs/cairo/cairo-perl/cairo-perl.typemap,v 1.4 2006/01/08 17:06:29 tsch Exp $
+# $Header: /cvs/cairo/cairo-perl/cairo-perl.typemap,v 1.5 2007-09-09 19:56:21 tsch Exp $
 #
 
 TYPEMAP
+
+# For backwards compatibility: The typemap shipped with perl 5.6.2 apparently
+# don't know const char *.
+const char * 	   	T_PV
 
 cairo_bool_t		T_UV
 
