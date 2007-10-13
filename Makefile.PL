@@ -3,8 +3,10 @@
 #
 # Licensed under the LGPL, see LICENSE file for more information.
 #
-# $Header: /cvs/cairo/cairo-perl/Makefile.PL,v 1.25 2007-09-27 20:23:40 tsch Exp $
+# $Header: /cvs/cairo/cairo-perl/Makefile.PL,v 1.28 2007-10-13 21:23:16 tsch Exp $
 #
+
+BEGIN { require 5.006; }
 
 use strict;
 use warnings;
@@ -341,11 +343,24 @@ WriteMakefile (
 	VERSION_FROM  => 'Cairo.pm',
 	ABSTRACT_FROM => 'Cairo.pm',
 	PREREQ_PM     => \%prereqs,
-	PREREQ_FATAL  => 1,
 	XSPROTOARG    => '-noprototypes',
 	FUNCLIST      => \@exports,
 	DL_FUNCS      => { Cairo=> [] },
+
 	$dep->get_makefile_vars,
+
+	EXTRA_META => qq(
+configure_requires:
+    ExtUtils::Depends: $prereqs{'ExtUtils::Depends'}
+    ExtUtils::PkgConfig: $prereqs{'ExtUtils::PkgConfig'}
+
+build_requires:
+    Test::Number::Delta: $prereqs{'Test::Number::Delta'}
+
+no_index:
+    file:
+    - MakeHelper.pm
+),
 );
 
 sub MY::postamble

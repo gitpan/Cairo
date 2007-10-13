@@ -3,10 +3,12 @@
  *
  * Licensed under the LGPL, see LICENSE file for more information.
  *
- * $Header: /cvs/cairo/cairo-perl/CairoPath.xs,v 1.1 2005/07/12 20:29:47 tsch Exp $
+ * $Header: /cvs/cairo/cairo-perl/CairoPath.xs,v 1.2 2007-09-30 12:54:32 tsch Exp $
  */
 
 #include <cairo-perl.h>
+
+#include "ppport.h"
 
 SV *
 newSVCairoPath (cairo_path_t * path)

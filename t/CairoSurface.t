@@ -1,9 +1,10 @@
+#!/usr/bin/perl
 #
 # Copyright (c) 2004-2005 by the cairo perl team (see the file README)
 #
 # Licensed under the LGPL, see LICENSE file for more information.
 #
-# $Header: /cvs/cairo/cairo-perl/t/CairoSurface.t,v 1.22 2007/05/27 12:34:20 tsch Exp $
+# $Header: /cvs/cairo/cairo-perl/t/CairoSurface.t,v 1.23 2007-10-07 13:11:59 tsch Exp $
 #
 
 use strict;
@@ -126,14 +127,14 @@ SKIP: {
 		my ($closure, $data) = @_;
 		is ($closure, 'blub');
 		like ($data, qr/PNG/);
-		die 'write-error';
+		die 'no-memory';
 	}, 'blub'), 'no-memory');
 
 	is ($surf->write_to_png_stream (sub {
 		my ($closure, $data) = @_;
 		is ($closure, undef);
 		like ($data, qr/PNG/);
-		die 'write-error';
+		die 'no-memory';
 	}), 'no-memory');
 
 	$surf = Cairo::ImageSurface->create_from_png ('tmp.png');

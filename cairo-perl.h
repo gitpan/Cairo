@@ -3,7 +3,7 @@
  *
  * Licensed under the LGPL, see LICENSE file for more information.
  *
- * $Header: /cvs/cairo/cairo-perl/cairo-perl.h,v 1.12 2007/05/06 11:28:37 tsch Exp $
+ * $Header: /cvs/cairo/cairo-perl/cairo-perl.h,v 1.12 2007-05-06 11:28:37 tsch Exp $
  *
  */
 

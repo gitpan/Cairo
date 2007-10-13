@@ -3,12 +3,14 @@
  *
  * Licensed under the LGPL, see LICENSE file for more information.
  *
- * $Header: /cvs/cairo/cairo-perl/cairo-perl-private.h,v 1.5 2006/11/09 19:43:43 tsch Exp $
+ * $Header: /cvs/cairo/cairo-perl/cairo-perl-private.h,v 1.6 2007-09-30 12:54:32 tsch Exp $
  *
  */
 
 #ifndef _CAIRO_PERL_PRIVATE_H_
 #define _CAIRO_PERL_PRIVATE_H_
+
+#include "ppport.h"
 
 void * cairo_perl_alloc_temp (int nbytes);
 

@@ -3,11 +3,14 @@
  *
  * Licensed under the LGPL, see LICENSE file for more information.
  *
- * $Header: /cvs/cairo/cairo-perl/CairoSurface.xs,v 1.19 2007/03/17 16:13:32 tsch Exp $
+ * $Header: /cvs/cairo/cairo-perl/CairoSurface.xs,v 1.20 2007-09-30 12:54:32 tsch Exp $
  */
 
 #include <cairo-perl.h>
 #include <cairo-perl-private.h>
+
+#define NEED_sv_2pv_flags
+#include "ppport.h"
 
 #if CAIRO_VERSION < CAIRO_VERSION_ENCODE(1, 2, 0)
 

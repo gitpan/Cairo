@@ -3,12 +3,15 @@
  *
  * Licensed under the LGPL, see LICENSE file for more information.
  *
- * $Header: /cvs/cairo/cairo-perl/Cairo.xs,v 1.20 2007/05/06 11:28:37 tsch Exp $
+ * $Header: /cvs/cairo/cairo-perl/Cairo.xs,v 1.21 2007-09-30 12:54:31 tsch Exp $
  *
  */
 
 #include <cairo-perl.h>
 #include <cairo-perl-private.h>
+
+#define NEED_newRV_noinc_GLOBAL
+#include "ppport.h"
 
 /* ------------------------------------------------------------------------- */
 
