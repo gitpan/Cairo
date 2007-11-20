@@ -1,9 +1,10 @@
+#!/usr/bin/perl
 #
 # Copyright (c) 2004-2005 by the cairo perl team (see the file README)
 #
 # Licensed under the LGPL, see LICENSE file for more information.
 #
-# $Header: /cvs/cairo/cairo-perl/t/CairoPath.t,v 1.1 2005/07/12 20:29:49 tsch Exp $
+# $Header: /cvs/cairo/cairo-perl/t/CairoPath.t,v 1.1.6.1 2007-11-20 20:01:08 tsch Exp $
 #
 
 use strict;
@@ -12,10 +13,8 @@ use Cairo;
 
 use Test::More tests => 4;
 
-use constant {
-	IMG_WIDTH => 256,
-	IMG_HEIGHT => 256,
-};
+use constant IMG_WIDTH => 256;
+use constant IMG_HEIGHT => 256;
 
 my $surf = Cairo::ImageSurface->create ('rgb24', IMG_WIDTH, IMG_HEIGHT);
 my $cr = Cairo::Context->create ($surf);

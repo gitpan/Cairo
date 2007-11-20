@@ -3,7 +3,7 @@
  *
  * Licensed under the LGPL, see LICENSE file for more information.
  *
- * $Header: /cvs/cairo/cairo-perl/CairoFont.xs,v 1.8 2006/08/10 17:34:40 tsch Exp $
+ * $Header: /cvs/cairo/cairo-perl/CairoFont.xs,v 1.8 2006-08-10 17:34:40 tsch Exp $
  */
 
 #include <cairo-perl.h>

@@ -3,7 +3,7 @@
 #
 # Licensed under the LGPL, see LICENSE file for more information.
 #
-# $Header: /cvs/cairo/cairo-perl/t/CairoMatrix.t,v 1.3 2005/07/29 17:19:55 tsch Exp $
+# $Header: /cvs/cairo/cairo-perl/t/CairoMatrix.t,v 1.3 2005-07-29 17:19:55 tsch Exp $
 #
 
 use strict;

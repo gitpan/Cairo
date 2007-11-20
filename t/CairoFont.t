@@ -1,9 +1,10 @@
+#!/usr/bin/perl
 #
 # Copyright (c) 2004-2005 by the cairo perl team (see the file README)
 #
 # Licensed under the LGPL, see LICENSE file for more information.
 #
-# $Header: /cvs/cairo/cairo-perl/t/CairoFont.t,v 1.4 2006/08/10 17:34:40 tsch Exp $
+# $Header: /cvs/cairo/cairo-perl/t/CairoFont.t,v 1.4.6.1 2007-11-20 20:01:08 tsch Exp $
 #
 
 use strict;
@@ -11,10 +12,8 @@ use warnings;
 
 use Test::More tests => 20;
 
-use constant {
-	IMG_WIDTH => 256,
-	IMG_HEIGHT => 256,
-};
+use constant IMG_WIDTH => 256;
+use constant IMG_HEIGHT => 256;
 
 use Cairo;
 

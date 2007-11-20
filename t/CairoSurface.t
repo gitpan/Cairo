@@ -4,7 +4,7 @@
 #
 # Licensed under the LGPL, see LICENSE file for more information.
 #
-# $Header: /cvs/cairo/cairo-perl/t/CairoSurface.t,v 1.23 2007-10-07 13:11:59 tsch Exp $
+# $Header: /cvs/cairo/cairo-perl/t/CairoSurface.t,v 1.23.2.1 2007-11-20 20:01:08 tsch Exp $
 #
 
 use strict;
@@ -14,10 +14,8 @@ use Config; # for byteorder
 
 use Test::More tests => 64;
 
-use constant {
-	IMG_WIDTH => 256,
-	IMG_HEIGHT => 256,
-};
+use constant IMG_WIDTH => 256;
+use constant IMG_HEIGHT => 256;
 
 use Cairo;
 
