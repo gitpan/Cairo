@@ -4,7 +4,7 @@
 #
 # Licensed under the LGPL, see LICENSE file for more information.
 #
-# $Header: /cvs/cairo/cairo-perl/t/CairoSurface.t,v 1.23.2.1 2007-11-20 20:01:08 tsch Exp $
+# $Header: /cvs/cairo/cairo-perl/t/CairoSurface.t,v 1.23.2.2 2007-12-29 14:04:13 tsch Exp $
 #
 
 use strict;
@@ -187,11 +187,12 @@ SKIP: {
 
 	# create_similar actually returns an image surface at the moment, but
 	# the compatibility layer has no way of knowing this and thus turns it
-	# into a pdf surface.
-	if (Cairo::VERSION >= Cairo::VERSION_ENCODE (1, 2, 0)) {
+	# into a pdf surface.  Recently, it also started returning meta
+	# surfaces whose type is internal, so the bindings have no other choice
+	# but represent them as plain surfaces.  Thus, mark this TODO for now.
+	TODO: {
+		local $TODO = 'create_similar returns surfaces whose type is not predictable';
 		isa_ok ($surf, 'Cairo::ImageSurface');
-	} else {
-		isa_ok ($surf, 'Cairo::PdfSurface');
 	}
 
 	unlink 'tmp.pdf';

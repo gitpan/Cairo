@@ -1,17 +1,18 @@
 --- #YAML:1.0
 name:                Cairo
-version:             1.044
+version:             1.045
 abstract:            Perl interface to the cairo library
 license:             ~
-generated_by:        ExtUtils::MakeMaker version 6.36
+author:              ~
+generated_by:        ExtUtils::MakeMaker version 6.42
 distribution_type:   module
 requires:     
     ExtUtils::Depends:             0.2
     ExtUtils::PkgConfig:           1
     Test::Number::Delta:           1
 meta-spec:
-    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
-    version: 1.2
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3
 
 configure_requires:
     ExtUtils::Depends: 0.2

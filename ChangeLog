@@ -1,3 +1,23 @@
+2008-01-07  Torsten Schoenfeld  <kaffeetisch@gmx.de>
+
+	* Cairo.pm
+	* NEWS: Stable release 1.045.
+
+2007-12-29  Torsten Schoenfeld  <kaffeetisch@gmx.de>
+
+	Merge from HEAD:
+
+	* Cairo.xs
+	* CairoFont.xs
+	* CairoMatrix.xs
+	* CairoSurface.xs: Use perl's New*/Safefree facilities instead of
+	calloc/malloc/free as the latter aren't safe on some platforms,
+	notably Win32.  Patch by T.J. Ferraro.
+
+	* t/CairoSurface.t: Mark the isa_ok test for PDF surfaces returned
+	by create_similar() as TODO, since the returned surface's type is
+	not reliable at this point.
+
 2007-11-20  Torsten Schoenfeld  <kaffeetisch@gmx.de>
 
 	* Cairo.pm

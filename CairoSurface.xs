@@ -3,7 +3,7 @@
  *
  * Licensed under the LGPL, see LICENSE file for more information.
  *
- * $Header: /cvs/cairo/cairo-perl/CairoSurface.xs,v 1.20 2007-09-30 12:54:32 tsch Exp $
+ * $Header: /cvs/cairo/cairo-perl/CairoSurface.xs,v 1.20.2.1 2007-12-29 14:03:53 tsch Exp $
  */
 
 #include <cairo-perl.h>
@@ -142,7 +142,7 @@ cairo_perl_callback_new (SV *func, SV *data)
 {
 	CairoPerlCallback *callback;
 
-	callback = calloc (sizeof (CairoPerlCallback), 1);
+	Newz (0, callback, 1, CairoPerlCallback);
 
 	callback->func = newSVsv (func);
 	if (data)
@@ -161,7 +161,7 @@ cairo_perl_callback_free (CairoPerlCallback *callback)
 	SvREFCNT_dec (callback->func);
 	if (callback->data)
 		SvREFCNT_dec (callback->data);
-	free (callback);
+	Safefree (callback);
 }
 
 /* -------------------------------------------------------------------------- */

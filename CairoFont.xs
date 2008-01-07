@@ -3,7 +3,7 @@
  *
  * Licensed under the LGPL, see LICENSE file for more information.
  *
- * $Header: /cvs/cairo/cairo-perl/CairoFont.xs,v 1.8 2006-08-10 17:34:40 tsch Exp $
+ * $Header: /cvs/cairo/cairo-perl/CairoFont.xs,v 1.8.6.1 2007-12-29 14:03:53 tsch Exp $
  */
 
 #include <cairo-perl.h>
@@ -72,12 +72,12 @@ cairo_text_extents_t * cairo_scaled_font_glyph_extents (cairo_scaled_font_t *sca
 	cairo_text_extents_t extents;
     CODE:
 	num_glyphs = items - 1;
-	glyphs = calloc (sizeof (cairo_glyph_t), num_glyphs);
+	Newz (0, glyphs, num_glyphs, cairo_glyph_t);
 	for (i = 1; i < items; i++)
 		glyphs[i - 1] = *SvCairoGlyph (ST (i));
 	cairo_scaled_font_glyph_extents (scaled_font, glyphs, num_glyphs, &extents);
 	RETVAL = &extents;
-	free (glyphs);
+	Safefree (glyphs);
     OUTPUT:
 	RETVAL
 
