@@ -2,7 +2,7 @@
 # this is all hacky etc. it works so it's gonna stay for now. it is not and
 # should not be installed.
 #
-# $Header: /cvs/cairo/cairo-perl/MakeHelper.pm,v 1.11 2006-12-30 19:16:31 tsch Exp $
+# $Header: /cvs/cairo/cairo-perl/MakeHelper.pm,v 1.11 2006/12/30 19:16:31 tsch Exp $
 #
 
 package MakeHelper;

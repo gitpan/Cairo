@@ -3,7 +3,7 @@
  *
  * Licensed under the LGPL, see LICENSE file for more information.
  *
- * $Header: /cvs/cairo/cairo-perl/Cairo.xs,v 1.21.2.1 2007-12-29 14:03:52 tsch Exp $
+ * $Header: /cvs/cairo/cairo-perl/Cairo.xs,v 1.25 2008-02-24 14:03:07 tsch Exp $
  *
  */
 
@@ -413,6 +413,12 @@ void cairo_rectangle (cairo_t * cr, double x, double y, double width, double hei
 
 void cairo_close_path (cairo_t * cr);
 
+#if CAIRO_VERSION >= CAIRO_VERSION_ENCODE(1, 5, 8) /* FIXME: 1.6 */
+
+void cairo_path_extents (cairo_t *cr, OUTLIST double x1, OUTLIST double y1, OUTLIST double x2, OUTLIST double y2);
+
+#endif
+
 void cairo_paint (cairo_t *cr);
 
 void cairo_paint_with_alpha (cairo_t *cr, double alpha);
@@ -583,6 +589,12 @@ double cairo_get_tolerance (cairo_t *cr);
 
 cairo_antialias_t cairo_get_antialias (cairo_t *cr);
 
+#if CAIRO_VERSION >= CAIRO_VERSION_ENCODE(1, 5, 10) /* FIXME: 1.6 */
+
+cairo_bool_t cairo_has_current_point (cairo_t *cr);
+
+#endif
+
 void cairo_get_current_point (cairo_t *cr, OUTLIST double x, OUTLIST double y);
 
 cairo_fill_rule_t cairo_get_fill_rule (cairo_t *cr);
@@ -677,6 +689,17 @@ bool
 HAS_SVG_SURFACE ()
     CODE:
 #ifdef CAIRO_HAS_SVG_SURFACE
+	RETVAL = TRUE;
+#else
+	RETVAL = FALSE;
+#endif
+    OUTPUT:
+	RETVAL
+
+bool
+HAS_FT_FONT ()
+    CODE:
+#ifdef CAIRO_HAS_FT_FONT
 	RETVAL = TRUE;
 #else
 	RETVAL = FALSE;

@@ -4,13 +4,13 @@
 #
 # Licensed under the LGPL, see LICENSE file for more information.
 #
-# $Header: /cvs/cairo/cairo-perl/t/Cairo.t,v 1.16.2.1 2007-11-20 20:01:07 tsch Exp $
+# $Header: /cvs/cairo/cairo-perl/t/Cairo.t,v 1.20 2008-02-24 14:03:08 tsch Exp $
 #
 
 use strict;
 use warnings;
 
-use Test::More tests => 68;
+use Test::More tests => 73;
 
 unless (eval 'use Test::Number::Delta; 1;') {
 	my $reason = 'Test::Number::Delta not available';
@@ -139,6 +139,16 @@ $cr->rel_curve_to (9.9, 0.0, 1.1, 2.2, 3.3, 4.4);
 $cr->rectangle (0.0, 1.1, 2.2, 3.3);
 $cr->close_path;
 
+SKIP: {
+	skip 'new stuff', 4
+		unless Cairo::VERSION >= Cairo::VERSION_ENCODE (1, 5, 8);
+
+	my ($x1, $y1, $x2, $y2) = $cr->path_extents;
+	foreach ($x1, $y1, $x2, $y2) {
+		ok (defined $_);
+	}
+}
+
 $cr->paint;
 $cr->paint_with_alpha (0.5);
 $cr->mask ($pat);
@@ -245,6 +255,13 @@ SKIP: {
 }
 
 isa_ok ($cr->get_source, 'Cairo::Pattern');
+
+SKIP: {
+	skip 'new stuff', 1
+		unless Cairo::VERSION >= Cairo::VERSION_ENCODE (1, 5, 10); # FIXME: 1.6
+
+	ok ($cr->has_current_point);
+}
 
 my @pnt = $cr->get_current_point;
 is (@pnt, 2);

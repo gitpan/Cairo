@@ -1,9 +1,9 @@
 #
-# Copyright (c) 2004-2007 by the cairo perl team (see the file README)
+# Copyright (c) 2004-2008 by the cairo perl team (see the file README)
 #
 # Licensed under the LGPL, see LICENSE file for more information.
 #
-# $Header: /cvs/cairo/cairo-perl/Cairo.pm,v 1.29.2.3 2008-01-07 18:07:06 tsch Exp $
+# $Header: /cvs/cairo/cairo-perl/Cairo.pm,v 1.40 2008-04-19 16:38:51 tsch Exp $
 #
 
 package Cairo;
@@ -14,7 +14,7 @@ use DynaLoader;
 
 our @ISA = qw/DynaLoader/;
 
-our $VERSION = '1.045';
+our $VERSION = '1.060';
 
 sub dl_load_flags { $^O eq 'darwin' ? 0x00 : 0x01 }
 
@@ -393,6 +393,8 @@ C<$cr-E<gt>close_path>.
 
 =back
 
+=head4 $bool = $cr->has_current_point [1.6]
+
 =head4 ($x, $y) = $cr->get_current_point
 
 =head4 $cr->new_path
@@ -400,6 +402,8 @@ C<$cr-E<gt>close_path>.
 =head4 $cr->new_sub_path [1.2]
 
 =head4 $cr->close_path
+
+=head4 ($x1, $y1, $x2, $y2) = $cr->path_extents [1.6]
 
 =head4 $cr->arc ($xc, $yc, $radius, $angle1, $angle2)
 
@@ -1126,6 +1130,22 @@ from a file:
 
 =head4 $type = $surface->get_type [1.2]
 
+=head4 $status = $surface->copy_page [1.6]
+
+=over
+
+=item $status: I<Cairo::Status>
+
+=back
+
+=head4 $status = $surface->show_page [1.6]
+
+=over
+
+=item $status: I<Cairo::Status>
+
+=back
+
 =cut
 
 # --------------------------------------------------------------------------- #
@@ -1330,6 +1350,34 @@ from a file:
 
 =back
 
+=head4 $surface->restrict_to_level ($level) [1.6]
+
+=over
+
+=item $level: I<Cairo::PsLevel>
+
+=back
+
+=head4 @levels = Cairo::PsSurface::get_levels [1.6]
+
+=head4 $string = Cairo::PsSurface::level_to_string ($level) [1.6]
+
+=over
+
+=item $level: I<Cairo::PsLevel>
+
+=back
+
+=head4 $surface->set_eps ($eps) [1.6]
+
+=over
+
+=item $eps: boolean
+
+=back
+
+=head4 $eps = $surface->get_eps [1.6]
+
 =cut
 
 # --------------------------------------------------------------------------- #
@@ -1370,9 +1418,9 @@ from a file:
 
 =back
 
-=head4 @versions = $surface->get_versions [1.2]
+=head4 @versions = Cairo::SvgSurface::get_versions [1.2]
 
-=head4 $string = $surface->version_to_string ($version) [1.2]
+=head4 $string = Cairo::SvgSurface::version_to_string ($version) [1.2]
 
 =over
 
@@ -1406,6 +1454,16 @@ from a file:
 
 =back
 
+=head4 $stride = Cairo::Format::stride_for_width ($format, $width) [1.6]
+
+=over
+
+=item $format: I<Cairo::Format>
+
+=item $width: integer
+
+=back
+
 =cut
 
 # --------------------------------------------------------------------------- #
@@ -1436,6 +1494,6 @@ Contains the reference manual
 
 =head1 COPYRIGHT
 
-Copyright (C) 2004-2007 by the cairo perl team
+Copyright (C) 2004-2008 by the cairo perl team
 
 =cut

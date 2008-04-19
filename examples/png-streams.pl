@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-# $Id: png-streams.pl,v 1.2 2007-03-17 16:13:32 tsch Exp $
+# $Id: png-streams.pl,v 1.2 2007/03/17 16:13:32 tsch Exp $
 
 use strict;
 use warnings;

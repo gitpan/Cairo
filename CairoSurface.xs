@@ -3,7 +3,7 @@
  *
  * Licensed under the LGPL, see LICENSE file for more information.
  *
- * $Header: /cvs/cairo/cairo-perl/CairoSurface.xs,v 1.20.2.1 2007-12-29 14:03:53 tsch Exp $
+ * $Header: /cvs/cairo/cairo-perl/CairoSurface.xs,v 1.25 2008-02-10 18:36:33 tsch Exp $
  */
 
 #include <cairo-perl.h>
@@ -316,6 +316,14 @@ cairo_surface_write_to_png_stream (cairo_surface_t *surface, SV *func, SV *data=
 
 #endif
 
+#if CAIRO_VERSION >= CAIRO_VERSION_ENCODE (1, 5, 8) /* FIXME: 1.6 */
+
+void cairo_surface_copy_page (cairo_surface_t *surface);
+
+void cairo_surface_show_page (cairo_surface_t *surface);
+
+#endif
+
 # --------------------------------------------------------------------------- #
 
 MODULE = Cairo::Surface	PACKAGE = Cairo::ImageSurface	PREFIX = cairo_image_surface_
@@ -496,6 +504,44 @@ void cairo_ps_surface_dsc_begin_page_setup (cairo_surface_t *surface);
 
 #endif
 
+#if CAIRO_VERSION >= CAIRO_VERSION_ENCODE(1, 5, 2) /* FIXME: 1.6 */
+
+void cairo_ps_surface_restrict_to_level (cairo_surface_t *surface, cairo_ps_level_t level);
+
+# void cairo_ps_get_levels (cairo_ps_level_t const **levels, int *num_levels);
+void
+cairo_ps_surface_get_levels (class=NULL)
+    PREINIT:
+	cairo_ps_level_t const *levels = NULL;
+	int num_levels = 0, i;
+    PPCODE:
+	PERL_UNUSED_VAR (ax);
+	cairo_ps_get_levels (&levels, &num_levels);
+	EXTEND (sp, num_levels);
+	for (i = 0; i < num_levels; i++)
+		PUSHs (sv_2mortal (newSVCairoPsLevel (levels[i])));
+
+# const char * cairo_ps_level_to_string (cairo_ps_level_t level);
+const char *
+cairo_ps_surface_level_to_string (...)
+    CODE:
+	if (items == 1) {
+		RETVAL = cairo_ps_level_to_string (SvCairoPsLevel (ST (0)));
+	} else if (items == 2) {
+		RETVAL = cairo_ps_level_to_string (SvCairoPsLevel (ST (1)));
+	} else {
+		RETVAL = NULL;
+		croak ("Usage: Cairo::PsSurface::level_to_string (level) or Cairo::PsSurface->level_to_string (level)");
+	}
+    OUTPUT:
+	RETVAL
+
+void cairo_ps_surface_set_eps (cairo_surface_t *surface, cairo_bool_t eps);
+
+cairo_bool_t cairo_ps_surface_get_eps (cairo_surface_t *surface);
+
+#endif
+
 #endif
 
 # --------------------------------------------------------------------------- #
@@ -562,5 +608,17 @@ cairo_svg_surface_version_to_string (...)
 	}
     OUTPUT:
 	RETVAL
+
+#endif
+
+# --------------------------------------------------------------------------- #
+
+#if CAIRO_VERSION >= CAIRO_VERSION_ENCODE(1, 5, 8) /* FIXME: 1.6 */
+
+MODULE = Cairo::Surface	PACKAGE = Cairo::Format	PREFIX = cairo_format_
+
+=for apidoc __function__
+=cut
+int cairo_format_stride_for_width (cairo_format_t format, int width);
 
 #endif

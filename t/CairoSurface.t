@@ -4,7 +4,7 @@
 #
 # Licensed under the LGPL, see LICENSE file for more information.
 #
-# $Header: /cvs/cairo/cairo-perl/t/CairoSurface.t,v 1.23.2.2 2007-12-29 14:04:13 tsch Exp $
+# $Header: /cvs/cairo/cairo-perl/t/CairoSurface.t,v 1.30 2008-02-10 18:36:33 tsch Exp $
 #
 
 use strict;
@@ -12,7 +12,7 @@ use warnings;
 
 use Config; # for byteorder
 
-use Test::More tests => 64;
+use Test::More tests => 72;
 
 use constant IMG_WIDTH => 256;
 use constant IMG_HEIGHT => 256;
@@ -104,6 +104,18 @@ isa_ok ($surf->get_font_options, 'Cairo::FontOptions');
 $surf->mark_dirty;
 $surf->mark_dirty_rectangle (10, 10, 10, 10);
 $surf->flush;
+
+SKIP: {
+	skip 'new stuff', 1
+		unless Cairo::VERSION >= Cairo::VERSION_ENCODE (1, 5, 8); # FIXME: 1.6
+
+	$surf->copy_page;
+	$surf->show_page;
+
+	like (Cairo::Format::stride_for_width ('argb32', 23), qr/\A\d+\z/);
+}
+
+# --------------------------------------------------------------------------- #
 
 sub clear {
 	if (Cairo::VERSION() < Cairo::VERSION_ENCODE (1, 2, 0)) {
@@ -213,7 +225,7 @@ SKIP: {
 }
 
 SKIP: {
-	skip 'ps surface', 8
+	skip 'ps surface', 15
 		unless Cairo::HAS_PS_SURFACE;
 
 	my $surf = Cairo::PsSurface->create ('tmp.ps', IMG_WIDTH, IMG_HEIGHT);
@@ -245,7 +257,6 @@ SKIP: {
 
 	unlink 'tmp.ps';
 
-
 	SKIP: {
 		skip 'create_for_stream on ps surfaces', 4
 			unless Cairo::VERSION >= Cairo::VERSION_ENCODE (1, 2, 0);
@@ -262,6 +273,28 @@ SKIP: {
 		}, 'blub', IMG_WIDTH, IMG_HEIGHT);
 		isa_ok ($surf, 'Cairo::PsSurface');
 		isa_ok ($surf, 'Cairo::Surface');
+	}
+
+	SKIP: {
+		skip 'new stuff', 7
+			unless Cairo::VERSION >= Cairo::VERSION_ENCODE (1, 5, 2); # FIXME: 1.6
+
+		$surf->restrict_to_level ('2');
+		$surf->restrict_to_level ('3');
+
+		my @levels = Cairo::PsSurface::get_levels();
+		ok (scalar @levels > 0);
+		is ($levels[0], '2');
+
+		@levels = Cairo::PsSurface->get_levels();
+		ok (scalar @levels > 0);
+		is ($levels[0], '2');
+
+		like (Cairo::PsSurface::level_to_string('2'), qr/2/);
+		like (Cairo::PsSurface->level_to_string('3'), qr/3/);
+
+		$surf->set_eps (1);
+		is ($surf->get_eps, 1);
 	}
 }
 

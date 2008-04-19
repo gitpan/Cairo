@@ -3,7 +3,7 @@
 #
 # Licensed under the LGPL, see LICENSE file for more information.
 #
-# $Header: /cvs/cairo/cairo-perl/Makefile.PL,v 1.28.2.1 2007-11-20 20:01:07 tsch Exp $
+# $Header: /cvs/cairo/cairo-perl/Makefile.PL,v 1.32 2008-03-22 18:34:58 tsch Exp $
 #
 
 BEGIN { require 5.006; }
@@ -56,7 +56,12 @@ my $autogen_dir = 'build';
 mkdir $autogen_dir unless (-d $autogen_dir);
 $MakeHelper::autogen_dir = $autogen_dir;
 
-my %cairo_cfg = ExtUtils::PkgConfig->find ("cairo >= $extreqs{cairo}");
+my %cairo_cfg;
+eval { %cairo_cfg = ExtUtils::PkgConfig->find ("cairo >= $extreqs{cairo}"); };
+if ($@ ne '') {
+	warn $@;
+	exit 0;
+}
 
 my %backend_guards = (
 	'cairo_pdf_surface_t' => 'CAIRO_HAS_PDF_SURFACE',
@@ -216,6 +221,7 @@ my %enums = (
 
 my $have_cairo_1_2 = ExtUtils::PkgConfig->atleast_version("cairo", "1.2.0");
 my $have_cairo_1_4 = ExtUtils::PkgConfig->atleast_version("cairo", "1.4.0");
+my $have_cairo_1_6 = ExtUtils::PkgConfig->atleast_version("cairo", "1.5.0"); # FIXME: 1.6
 
 if ($have_cairo_1_2) {
 	my %new = (
@@ -289,6 +295,16 @@ if ($have_cairo_1_4) {
 	}
 }
 
+if ($have_cairo_1_6) {
+	$enums{cairo_ps_level_t} = [qw/
+		CAIRO_PS_LEVEL_
+		CAIRO_PS_LEVEL_2
+		CAIRO_PS_LEVEL_3
+	/];
+} else {
+	$enums{cairo_ps_level_t} = [];
+}
+
 # --------------------------------------------------------------------------- #
 
 my %enum_guards = (
@@ -297,7 +313,23 @@ my %enum_guards = (
 
 MakeHelper::do_enums (\%enums, \%enum_guards);
 
-my @xs_files = <*.xs>;
+my @xs_files = qw(
+	Cairo.xs
+	CairoFont.xs
+	CairoMatrix.xs
+	CairoPath.xs
+	CairoPattern.xs
+	CairoSurface.xs
+);
+
+my $have_cairo_ft = !system qw(pkg-config --exists --silence-errors cairo-ft);
+if ($have_cairo_ft) {
+	print "Compiling Cairo with FreeType support\n";
+	push @xs_files, 'CairoFt.xs';
+	my %ft_cfg = ExtUtils::PkgConfig->find ('cairo-ft');
+	$cairo_cfg{cflags} .= ' '.$ft_cfg{cflags};
+	$cairo_cfg{libs} .= ' '.$ft_cfg{libs};
+}
 
 MakeHelper::write_boot (
 	xs_files => \@xs_files,
