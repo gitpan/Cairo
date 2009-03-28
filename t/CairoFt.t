@@ -4,7 +4,7 @@
 #
 # Licensed under the LGPL, see LICENSE file for more information.
 #
-# $Header: /cvs/cairo/cairo-perl/t/CairoFt.t,v 1.1 2007-10-24 16:32:05 tsch Exp $
+# $Id: CairoFt.t 162 2008-10-05 19:59:42Z tsch $
 #
 
 use strict;

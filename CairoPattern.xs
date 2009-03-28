@@ -3,7 +3,7 @@
  *
  * Licensed under the LGPL, see LICENSE file for more information.
  *
- * $Header: /cvs/cairo/cairo-perl/CairoPattern.xs,v 1.14 2007-09-30 12:54:32 tsch Exp $
+ * $Id: CairoPattern.xs 162 2008-10-05 19:59:42Z tsch $
  */
 
 #include <cairo-perl.h>

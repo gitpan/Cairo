@@ -1,26 +1,27 @@
 --- #YAML:1.0
-name:                Cairo
-version:             1.060
-abstract:            Perl interface to the cairo library
-license:             ~
-author:              ~
-generated_by:        ExtUtils::MakeMaker version 6.44
-distribution_type:   module
-requires:     
-    ExtUtils::Depends:             0.2
-    ExtUtils::PkgConfig:           1
-    Test::Number::Delta:           1
-meta-spec:
-    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
-    version: 1.3
-
+name:               Cairo
+version:            1.061
+abstract:           Perl interface to the cairo library
+author:  []
+license:            unknown
+distribution_type:  module
 configure_requires:
-    ExtUtils::Depends: 0.2
-    ExtUtils::PkgConfig: 1
-
+    ExtUtils::Depends:    0.2
+    ExtUtils::MakeMaker:  0
+    ExtUtils::PkgConfig:  1
 build_requires:
-    Test::Number::Delta: 1
-
+    ExtUtils::MakeMaker:  0
+    Test::Number::Delta:  1
+requires:
+    ExtUtils::Depends:    0.2
+    ExtUtils::PkgConfig:  1
 no_index:
-    file:
-    - MakeHelper.pm
+    directory:
+        - t
+        - inc
+    files:
+        - inc/MakeHelper.pm
+generated_by:       ExtUtils::MakeMaker version 6.50
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

@@ -2,7 +2,7 @@
 # this is all hacky etc. it works so it's gonna stay for now. it is not and
 # should not be installed.
 #
-# $Header: /cvs/cairo/cairo-perl/MakeHelper.pm,v 1.11 2006/12/30 19:16:31 tsch Exp $
+# $Id: MakeHelper.pm 170 2009-03-28 13:19:27Z tsch $
 #
 
 package MakeHelper;
@@ -253,8 +253,8 @@ EOS
 		}
 
 		print HEADER <<"EOS";
-int cairo_${name}_from_sv (SV * $name);
-SV * cairo_${name}_to_sv (int val);
+$type cairo_${name}_from_sv (SV * $name);
+SV * cairo_${name}_to_sv ($type val);
 #define Sv$mangled(sv)		(cairo_${name}_from_sv (sv))
 #define newSV$mangled(val)	(cairo_${name}_to_sv (val))
 EOS
@@ -371,7 +371,7 @@ EOS
 		}
 
 		print ENUMS <<"EOS";
-int
+$type
 cairo_${name}_from_sv (SV * $name)
 {
 	char * str = SvPV_nolen ($name);
@@ -383,7 +383,7 @@ cairo_${name}_from_sv (SV * $name)
 }
 
 SV *
-cairo_${name}_to_sv (int val)
+cairo_${name}_to_sv ($type val)
 {
 	$tree_to
 	warn ("unknown $type value %d encountered", val);

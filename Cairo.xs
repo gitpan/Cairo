@@ -3,7 +3,7 @@
  *
  * Licensed under the LGPL, see LICENSE file for more information.
  *
- * $Header: /cvs/cairo/cairo-perl/Cairo.xs,v 1.25 2008-02-24 14:03:07 tsch Exp $
+ * $Id: Cairo.xs 169 2009-03-28 13:11:19Z tsch $
  *
  */
 
@@ -55,7 +55,7 @@ void *
 cairo_object_from_sv (SV *sv, const char *package)
 {
 	if (!SvOK (sv) || !SvROK (sv) || !sv_derived_from (sv, package))
-		croak("Cannot convert scalar 0x%x to an object of type %s",
+		croak("Cannot convert scalar %p to an object of type %s",
 		      sv, package);
 	return INT2PTR (void *, SvIV ((SV *) SvRV (sv)));
 }
@@ -74,7 +74,7 @@ void *
 cairo_struct_from_sv (SV *sv, const char *package)
 {
 	if (!SvOK (sv) || !SvROK (sv) || !sv_derived_from (sv, package))
-		croak("Cannot convert scalar 0x%x to a struct of type %s",
+		croak("Cannot convert scalar %p to a struct of type %s",
 		      sv, package);
 	return INT2PTR (void *, SvIV ((SV *) SvRV (sv)));
 }

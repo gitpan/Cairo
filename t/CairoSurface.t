@@ -4,7 +4,7 @@
 #
 # Licensed under the LGPL, see LICENSE file for more information.
 #
-# $Header: /cvs/cairo/cairo-perl/t/CairoSurface.t,v 1.30 2008-02-10 18:36:33 tsch Exp $
+# $Id: CairoSurface.t 162 2008-10-05 19:59:42Z tsch $
 #
 
 use strict;
@@ -229,6 +229,10 @@ SKIP: {
 		unless Cairo::HAS_PS_SURFACE;
 
 	my $surf = Cairo::PsSurface->create ('tmp.ps', IMG_WIDTH, IMG_HEIGHT);
+
+	skip 'create returned no ps surface', 15
+		unless defined $surf && $surf->isa ('Cairo::PsSurface');
+
 	isa_ok ($surf, 'Cairo::PsSurface');
 	isa_ok ($surf, 'Cairo::Surface');
 

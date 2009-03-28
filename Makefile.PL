@@ -3,7 +3,7 @@
 #
 # Licensed under the LGPL, see LICENSE file for more information.
 #
-# $Header: /cvs/cairo/cairo-perl/Makefile.PL,v 1.32 2008-03-22 18:34:58 tsch Exp $
+# $Id: Makefile.PL 170 2009-03-28 13:19:27Z tsch $
 #
 
 BEGIN { require 5.006; }
@@ -11,7 +11,8 @@ BEGIN { require 5.006; }
 use strict;
 use warnings;
 use ExtUtils::MakeMaker;
-use MakeHelper;
+
+require './inc/MakeHelper.pm';
 
 my %extreqs = (
 	'cairo' => '1.0.0',
@@ -27,7 +28,7 @@ my %prereqs = (
 while ((my $module, my $version) = each(%prereqs)) {
 	unless (eval "use $module $version; 1" ) {
 		print "This module requires $module to install itself.\n";
-		my $yn = ExtUtils::MakeMaker::prompt("  Install $module from CPAN?", 'y');
+		my $yn = ExtUtils::MakeMaker::prompt("  Install $module from CPAN?", 'n');
 
 		unless ($yn =~ /^y/i) {
 			die " *** Cannot install without $module.  Exiting ...\n";
@@ -48,9 +49,6 @@ while ((my $module, my $version) = each(%prereqs)) {
 	}
 	eval "use $module $version; 1" or die $@;
 }
-
-# Add this now since it's not required to generate a Makefile.
-$prereqs{'Test::Number::Delta'} = 1.00;
 
 my $autogen_dir = 'build';
 mkdir $autogen_dir unless (-d $autogen_dir);
@@ -301,6 +299,17 @@ if ($have_cairo_1_6) {
 		CAIRO_PS_LEVEL_2
 		CAIRO_PS_LEVEL_3
 	/];
+
+	my %new = (
+		cairo_font_type_t => [qw/CAIRO_FONT_TYPE_QUARTZ/],
+	);
+
+	foreach my $enum (keys %new) {
+		foreach my $value (@{$new{$enum}}) {
+			push @{$enums{$enum}}, $value;
+		}
+	}
+
 } else {
 	$enums{cairo_ps_level_t} = [];
 }
@@ -345,7 +354,7 @@ $dep->set_inc ('-I. -I'.$autogen_dir.' '.$cairo_cfg{cflags});
 $dep->set_libs ($cairo_cfg{libs});
 $dep->add_xs (@xs_files);
 $dep->add_c ('cairo-perl-enums.c');
-$dep->add_pm ('Cairo.pm' => '$(INST_LIBDIR)/Cairo.pm');
+$dep->add_pm ('lib/Cairo.pm' => '$(INST_LIBDIR)/Cairo.pm');
 $dep->add_typemaps (@typemaps);
 
 $dep->install (qw(cairo-perl.h
@@ -374,8 +383,8 @@ my @exports = qw(
 
 WriteMakefile (
 	NAME          => 'Cairo',
-	VERSION_FROM  => 'Cairo.pm',
-	ABSTRACT_FROM => 'Cairo.pm',
+	VERSION_FROM  => 'lib/Cairo.pm',
+	ABSTRACT_FROM => 'lib/Cairo.pm',
 	PREREQ_PM     => \%prereqs,
 	XSPROTOARG    => '-noprototypes',
 	FUNCLIST      => \@exports,
@@ -383,18 +392,15 @@ WriteMakefile (
 
 	$dep->get_makefile_vars,
 
-	EXTRA_META => qq(
-configure_requires:
-    ExtUtils::Depends: $prereqs{'ExtUtils::Depends'}
-    ExtUtils::PkgConfig: $prereqs{'ExtUtils::PkgConfig'}
-
-build_requires:
-    Test::Number::Delta: $prereqs{'Test::Number::Delta'}
-
-no_index:
-    file:
-    - MakeHelper.pm
-),
+	META_MERGE => {
+		configure_requires => \%prereqs,
+		build_requires => {
+			'Test::Number::Delta' => 1.0,
+		},
+		no_index => {
+			files => [qw(inc/MakeHelper.pm)],
+		},
+        },
 );
 
 sub MY::postamble

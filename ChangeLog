@@ -1,3 +1,95 @@
+2009-03-28  Torsten Schoenfeld  <kaffeetisch@gmx.de>
+
+	* NEWS
+	* README
+	* lib/Cairo.pm: Stable release 1.061.
+
+2009-03-28  Torsten Schoenfeld  <kaffeetisch@gmx.de>
+
+	* Cairo.pm → lib/Cairo.pm (moved)
+	* MakeHelper.pm → inc/MakeHelper.pm (moved)
+	* MANIFEST
+	* Makefile.PL: Move the two modules into their own folders to make
+	it clear that the one is the real thing while the other is just
+	build helper code.
+
+2009-03-28  Torsten Schoenfeld  <kaffeetisch@gmx.de>
+
+	* Cairo.xs (cairo_object_from_sv, cairo_struct_from_sv): Hush two
+	compiler warnings.
+
+2009-03-28  Torsten Schoenfeld  <kaffeetisch@gmx.de>
+
+	* Cairo.pm: In the POD, use =item instead of =head4 for methods so
+	that not every single method shows up in a table of contents.
+	Also fix two other small POD glitches.
+
+2009-03-28  Torsten Schoenfeld  <kaffeetisch@gmx.de>
+
+	* MANIFEST.SKIP: Update for SVN.
+
+2009-03-28  Torsten Schoenfeld  <kaffeetisch@gmx.de>
+
+	* Makefile.PL: Use EU::MM's META_MERGE instead of EXTRA_META.
+
+2008-10-26  Torsten Schoenfeld  <kaffeetisch@gmx.de>
+
+	* Makefile.PL: CAIRO_FONT_TYPE_QUARTZ was introduced in cairo 1.6,
+	not 1.4.
+
+2008-10-05  Torsten Schoenfeld  <kaffeetisch@gmx.de>
+
+	* MakeHelper.pm: Use the correct enum type instead of int for the
+	enum converters.
+
+2008-10-05  Torsten Schoenfeld  <kaffeetisch@gmx.de>
+
+	* Cairo.pm:
+	* Cairo.xs:
+	* CairoFont.xs:
+	* CairoFt.xs:
+	* CairoMatrix.xs:
+	* CairoPath.xs:
+	* CairoPattern.xs:
+	* CairoSurface.xs:
+	* MakeHelper.pm:
+	* Makefile.PL:
+	* cairo-perl-private.h:
+	* cairo-perl.h:
+	* cairo-perl.typemap:
+	* examples/simple.pl:
+	* t/Cairo.t:
+	* t/CairoFont.t:
+	* t/CairoFt.t:
+	* t/CairoMatrix.t:
+	* t/CairoPath.t:
+	* t/CairoPattern.t:
+	* t/CairoSurface.t: In preparation of the move to SVN, use the Id
+	keyword in place of Header.
+
+2008-09-07  Torsten Schoenfeld  <kaffeetisch@gmx.de>
+
+	* Makefile.PL: When prompting for auto-installing dependencies,
+	default to 'no' so that automatic testers with CPANPLUS.pm don't
+	end up invoking CPAN.pm.  (RT #38286)
+
+2008-09-06  Torsten Schoenfeld  <kaffeetisch@gmx.de>
+
+	* README: Fix the dependency versions for EU::Depends and
+	EU::PkgConfig.
+
+	* Cairo.pm: Mention http://cairographics.org/manual/ in the API
+	documentation section.  Fix a POD error.
+
+	* Makefile.PL: Support the enum value CAIRO_FONT_TYPE_QUARTZ.  (RT
+	#34681)
+
+2008-06-01  Torsten Schoenfeld  <kaffeetisch@gmx.de>
+
+	* t/CairoSurface.t: Cairo::PsSurface->create can under certain
+	conditions apparently return a surface that is not a PS surface.
+	Handle this gracefully.  (RT #33871)
+
 2008-04-19  Torsten Schoenfeld  <kaffeetisch@gmx.de>
 
 	* Cairo.pm

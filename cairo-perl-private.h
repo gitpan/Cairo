@@ -3,7 +3,7 @@
  *
  * Licensed under the LGPL, see LICENSE file for more information.
  *
- * $Header: /cvs/cairo/cairo-perl/cairo-perl-private.h,v 1.6 2007-09-30 12:54:32 tsch Exp $
+ * $Id: cairo-perl-private.h 162 2008-10-05 19:59:42Z tsch $
  *
  */
 

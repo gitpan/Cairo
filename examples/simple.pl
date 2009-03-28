@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 #
-# $Header: /cvs/cairo/cairo-perl/examples/simple.pl,v 1.3 2006/06/03 14:21:10 tsch Exp $
+# $Id: simple.pl 162 2008-10-05 19:59:42Z tsch $
 #
 
 use strict;
