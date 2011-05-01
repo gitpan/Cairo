@@ -2,7 +2,7 @@
 # this is all hacky etc. it works so it's gonna stay for now. it is not and
 # should not be installed.
 #
-# $Id: MakeHelper.pm 170 2009-03-28 13:19:27Z tsch $
+# $Id$
 #
 
 package MakeHelper;

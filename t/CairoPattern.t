@@ -4,7 +4,7 @@
 #
 # Licensed under the LGPL, see LICENSE file for more information.
 #
-# $Id: CairoPattern.t 162 2008-10-05 19:59:42Z tsch $
+# $Id$
 #
 
 use strict;

@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 #
-# $Id: simple.pl 162 2008-10-05 19:59:42Z tsch $
+# $Id$
 #
 
 use strict;

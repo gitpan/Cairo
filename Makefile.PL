@@ -3,7 +3,7 @@
 #
 # Licensed under the LGPL, see LICENSE file for more information.
 #
-# $Id: Makefile.PL 170 2009-03-28 13:19:27Z tsch $
+# $Id$
 #
 
 BEGIN { require 5.006; }

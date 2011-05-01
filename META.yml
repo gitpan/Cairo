@@ -1,6 +1,6 @@
 --- #YAML:1.0
 name:               Cairo
-version:            1.061
+version:            1.062
 abstract:           Perl interface to the cairo library
 author:  []
 license:            unknown
@@ -21,7 +21,7 @@ no_index:
         - inc
     files:
         - inc/MakeHelper.pm
-generated_by:       ExtUtils::MakeMaker version 6.50
+generated_by:       ExtUtils::MakeMaker version 6.56
 meta-spec:
     url:      http://module-build.sourceforge.net/META-spec-v1.4.html
     version:  1.4

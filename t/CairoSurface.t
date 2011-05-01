@@ -4,7 +4,7 @@
 #
 # Licensed under the LGPL, see LICENSE file for more information.
 #
-# $Id: CairoSurface.t 162 2008-10-05 19:59:42Z tsch $
+# $Id$
 #
 
 use strict;
@@ -67,11 +67,9 @@ is ($surf->get_height, IMG_HEIGHT);
 	}
 }
 
-$surf->finish;
-
-$surf = $surf->create_similar ('color', IMG_WIDTH, IMG_HEIGHT);
-isa_ok ($surf, 'Cairo::ImageSurface');
-isa_ok ($surf, 'Cairo::Surface');
+my $similar = $surf->create_similar ('color', IMG_WIDTH, IMG_HEIGHT);
+isa_ok ($similar, 'Cairo::ImageSurface');
+isa_ok ($similar, 'Cairo::Surface');
 
 # Test that the enum wrappers differentiate between color and color-alpha.
 SKIP: {
@@ -114,6 +112,8 @@ SKIP: {
 
 	like (Cairo::Format::stride_for_width ('argb32', 23), qr/\A\d+\z/);
 }
+
+$surf->finish;
 
 # --------------------------------------------------------------------------- #
 

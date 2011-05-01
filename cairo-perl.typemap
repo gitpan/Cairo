@@ -3,7 +3,7 @@
 #
 # Licensed under the LGPL, see LICENSE file for more information.
 #
-# $Id: cairo-perl.typemap 162 2008-10-05 19:59:42Z tsch $
+# $Id$
 #
 
 TYPEMAP
@@ -29,13 +29,6 @@ T_CAIRO_GLYPH
 
 T_CAIRO_PATH
 	$var = SvCairoPath ($arg);
-
-T_FT_FACE
-	if (sv_isobject ($arg) && sv_derived_from ($arg, \"Font::FreeType::Face\")) {
-		$var = ($type) SvIV ((SV *) SvRV ($arg));
-	} else {
-		croak(\"$var is not of type Font::FreeType::Face\");
-	}
 
 OUTPUT
 

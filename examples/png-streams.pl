@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-# $Id: png-streams.pl 88 2007-03-17 16:13:32Z tsch $
+# $Id$
 
 use strict;
 use warnings;

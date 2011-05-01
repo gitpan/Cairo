@@ -3,7 +3,7 @@
  *
  * Licensed under the LGPL, see LICENSE file for more information.
  *
- * $Id: CairoMatrix.xs 162 2008-10-05 19:59:42Z tsch $
+ * $Id$
  */
 
 #include <cairo-perl.h>

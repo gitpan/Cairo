@@ -3,7 +3,7 @@
  *
  * Licensed under the LGPL, see LICENSE file for more information.
  *
- * $Id: Cairo.xs 169 2009-03-28 13:11:19Z tsch $
+ * $Id$
  *
  */
 
