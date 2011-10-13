@@ -57,12 +57,31 @@ SV * newSVCairoTextExtents (cairo_text_extents_t *extents);
 SV * newSVCairoGlyph (cairo_glyph_t *glyph);
 cairo_glyph_t * SvCairoGlyph (SV *sv);
 
+#if CAIRO_VERSION >= CAIRO_VERSION_ENCODE(1, 8, 0)
+
+SV * newSVCairoTextCluster (cairo_text_cluster_t *cluster);
+cairo_text_cluster_t * SvCairoTextCluster (SV *sv);
+
+#endif
+
 SV * newSVCairoPath (cairo_path_t *path);
 cairo_path_t * SvCairoPath (SV *sv);
 
 #if CAIRO_VERSION >= CAIRO_VERSION_ENCODE(1, 4, 0)
 
+#undef newSVCairoRectangle
+#undef SvCairoRectangle
 SV * newSVCairoRectangle (cairo_rectangle_t *rectangle);
+cairo_rectangle_t * SvCairoRectangle (SV *sv);
+
+#endif
+
+#if CAIRO_VERSION >= CAIRO_VERSION_ENCODE(1, 10, 0)
+
+#undef newSVCairoRectangleInt
+#undef SvCairoRectangleInt
+SV * newSVCairoRectangleInt (cairo_rectangle_int_t *rectangle);
+cairo_rectangle_int_t * SvCairoRectangleInt (SV *sv);
 
 #endif
 
@@ -83,5 +102,14 @@ SV * cairo_pattern_to_sv (cairo_pattern_t *surface);
 #undef newSVCairoPattern_noinc
 #define newSVCairoPattern(object)	(cairo_pattern_to_sv (cairo_pattern_reference (object)))
 #define newSVCairoPattern_noinc(object)	(cairo_pattern_to_sv (object))
+
+/*
+ * special treatment for font faces
+ */
+SV * cairo_font_face_to_sv (cairo_font_face_t *surface);
+#undef newSVCairoFontFace
+#undef newSVCairoFontFace_noinc
+#define newSVCairoFontFace(object)		(cairo_font_face_to_sv (cairo_font_face_reference (object)))
+#define newSVCairoFontFace_noinc(object)	(cairo_font_face_to_sv (object))
 
 #endif /* _CAIRO_PERL_H_ */

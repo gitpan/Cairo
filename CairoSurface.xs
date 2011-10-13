@@ -85,6 +85,12 @@ get_package (cairo_surface_t *surface)
 		package = "Cairo::SvgSurface";
 		break;
 
+#if CAIRO_VERSION >= CAIRO_VERSION_ENCODE(1, 10, 0)
+	    case CAIRO_SURFACE_TYPE_RECORDING:
+		package = "Cairo::RecordingSurface";
+		break;
+#endif
+
 	    case CAIRO_SURFACE_TYPE_XLIB:
 	    case CAIRO_SURFACE_TYPE_XCB:
 	    case CAIRO_SURFACE_TYPE_GLITZ:
@@ -92,6 +98,20 @@ get_package (cairo_surface_t *surface)
 	    case CAIRO_SURFACE_TYPE_WIN32:
 	    case CAIRO_SURFACE_TYPE_BEOS:
 	    case CAIRO_SURFACE_TYPE_DIRECTFB:
+	    case CAIRO_SURFACE_TYPE_OS2:
+	    case CAIRO_SURFACE_TYPE_WIN32_PRINTING:
+	    case CAIRO_SURFACE_TYPE_QUARTZ_IMAGE:
+#if CAIRO_VERSION >= CAIRO_VERSION_ENCODE(1, 10, 0)
+	    case CAIRO_SURFACE_TYPE_SCRIPT:
+	    case CAIRO_SURFACE_TYPE_QT:
+	    case CAIRO_SURFACE_TYPE_VG:
+	    case CAIRO_SURFACE_TYPE_GL:
+	    case CAIRO_SURFACE_TYPE_DRM:
+	    case CAIRO_SURFACE_TYPE_TEE:
+	    case CAIRO_SURFACE_TYPE_XML:
+	    case CAIRO_SURFACE_TYPE_SKIA:
+	    case CAIRO_SURFACE_TYPE_SUBSURFACE:
+#endif
 		package = "Cairo::Surface";
 		break;
 
@@ -166,6 +186,24 @@ cairo_perl_callback_free (CairoPerlCallback *callback)
 
 /* -------------------------------------------------------------------------- */
 
+/* Caller owns returned SV */
+static SV *
+strip_off_location (SV *error)
+{
+	SV *saved_defsv, *result;
+	saved_defsv = newSVsv (DEFSV);
+	ENTER;
+	SAVETMPS;
+	sv_setsv (DEFSV, error);
+	eval_pv ("s/^([-_\\w]+) .+$/$1/s", FALSE);
+	result = newSVsv (DEFSV);
+	FREETMPS;
+	LEAVE;
+	sv_setsv (DEFSV, saved_defsv);
+	SvREFCNT_dec (saved_defsv);
+	return result;
+}
+
 static cairo_status_t
 write_func_marshaller (void *closure,
                        const unsigned char *data,
@@ -192,7 +230,9 @@ write_func_marshaller (void *closure,
 	SPAGAIN;
 
 	if (SvTRUE (ERRSV)) {
-		status = SvCairoStatus (ERRSV);
+		SV *sv = strip_off_location (ERRSV);
+		status = SvCairoStatus (sv);
+		SvREFCNT_dec (sv);
 	}
 
 	PUTBACK;
@@ -230,7 +270,9 @@ read_func_marshaller (void *closure,
 	SPAGAIN;
 
 	if (SvTRUE (ERRSV)) {
-		status = SvCairoStatus (ERRSV);
+		SV *sv = strip_off_location (ERRSV);
+		status = SvCairoStatus (sv);
+		SvREFCNT_dec (sv);
 	} else {
 		SV *retval = POPs;
 		memcpy (data, SvPV_nolen (retval), sv_len (retval));
@@ -251,14 +293,36 @@ void DESTROY (cairo_surface_t * surface);
     CODE:
 	cairo_surface_destroy (surface);
 
-cairo_surface_t_noinc * cairo_surface_create_similar (cairo_surface_t * other, cairo_content_t content, int width, int height);
-    POSTCALL:
+cairo_surface_t_noinc *
+cairo_surface_create_similar (...)
+    PREINIT:
+	int offset = 0;
+	cairo_surface_t * other = NULL;
+	cairo_content_t content = 0;
+	int width = 0;
+	int height = 0;
+    CODE:
+	if (items == 4) {
+		offset = 0;
+	} else if (items == 5) {
+		offset = 1;
+	} else {
+		croak ("Usage: Cairo::Surface->create_similar ($other, $content, $width, $height)\n"
+		       " -or-: $other->create_similar ($content, $width, $height)");
+	}
+	other = SvCairoSurface (ST (0 + offset));
+	content = SvCairoContent (ST (1 + offset));
+	width = SvIV (ST (2 + offset));
+	height = SvIV (ST (3 + offset));
+	RETVAL = cairo_surface_create_similar (other, content, width, height);
 #if CAIRO_VERSION < CAIRO_VERSION_ENCODE(1, 2, 0)
-    {
+	{
 	const char *package = cairo_perl_package_table_lookup (other);
 	cairo_perl_package_table_insert (RETVAL, package ? package : "Cairo::Surface");
-    }
+	}
 #endif
+    OUTPUT:
+	RETVAL
 
 void cairo_surface_finish (cairo_surface_t *surface);
 
@@ -271,6 +335,12 @@ void cairo_surface_set_device_offset (cairo_surface_t *surface, double x_offset,
 void cairo_surface_get_device_offset (cairo_surface_t *surface, OUTLIST double x_offset, OUTLIST double y_offset);
 
 void cairo_surface_set_fallback_resolution (cairo_surface_t *surface, double x_pixels_per_inch, double y_pixels_per_inch);
+
+#endif
+
+#if CAIRO_VERSION >= CAIRO_VERSION_ENCODE(1, 8, 0)
+
+void cairo_surface_get_fallback_resolution (cairo_surface_t *surface, OUTLIST double x_pixels_per_inch, OUTLIST double y_pixels_per_inch);
 
 #endif
 
@@ -316,11 +386,27 @@ cairo_surface_write_to_png_stream (cairo_surface_t *surface, SV *func, SV *data=
 
 #endif
 
-#if CAIRO_VERSION >= CAIRO_VERSION_ENCODE (1, 5, 8) /* FIXME: 1.6 */
+#if CAIRO_VERSION >= CAIRO_VERSION_ENCODE (1, 6, 0)
 
 void cairo_surface_copy_page (cairo_surface_t *surface);
 
 void cairo_surface_show_page (cairo_surface_t *surface);
+
+#endif
+
+#if CAIRO_VERSION >= CAIRO_VERSION_ENCODE (1, 8, 0)
+
+cairo_bool_t cairo_surface_has_show_text_glyphs (cairo_surface_t *surface);
+
+#endif
+
+#if CAIRO_VERSION >= CAIRO_VERSION_ENCODE (1, 10, 0)
+
+# cairo_surface_t * cairo_surface_create_for_rectangle (cairo_surface_t *target, double x, double y, double width, double height);
+cairo_surface_t_noinc *
+cairo_surface_create_for_rectangle (class, cairo_surface_t *target, double x, double y, double width, double height)
+    C_ARGS:
+	target, x, y, width, height
 
 #endif
 
@@ -452,6 +538,40 @@ void cairo_pdf_surface_set_size (cairo_surface_t *surface, double width_in_point
 
 #endif
 
+#if CAIRO_VERSION >= CAIRO_VERSION_ENCODE(1, 10, 0)
+
+void cairo_pdf_surface_restrict_to_version (cairo_surface_t *surface, cairo_pdf_version_t version);
+
+# void cairo_pdf_get_versions (cairo_pdf_version_t const **versions, int *num_versions);
+void
+cairo_pdf_surface_get_versions (class=NULL)
+    PREINIT:
+	cairo_pdf_version_t const *versions = NULL;
+	int num_versions = 0, i;
+    PPCODE:
+	PERL_UNUSED_VAR (ax);
+	cairo_pdf_get_versions (&versions, &num_versions);
+	EXTEND (sp, num_versions);
+	for (i = 0; i < num_versions; i++)
+		PUSHs (sv_2mortal (newSVCairoPdfVersion (versions[i])));
+
+# const char * cairo_pdf_version_to_string (cairo_pdf_version_t version);
+const char *
+cairo_pdf_surface_version_to_string (...)
+    CODE:
+	if (items == 1) {
+		RETVAL = cairo_pdf_version_to_string (SvCairoPdfVersion (ST (0)));
+	} else if (items == 2) {
+		RETVAL = cairo_pdf_version_to_string (SvCairoPdfVersion (ST (1)));
+	} else {
+		RETVAL = NULL;
+		croak ("Usage: Cairo::PdfSurface::version_to_string (version) or Cairo::PdfSurface->version_to_string (version)");
+	}
+    OUTPUT:
+	RETVAL
+
+#endif
+
 #endif
 
 # --------------------------------------------------------------------------- #
@@ -504,7 +624,7 @@ void cairo_ps_surface_dsc_begin_page_setup (cairo_surface_t *surface);
 
 #endif
 
-#if CAIRO_VERSION >= CAIRO_VERSION_ENCODE(1, 5, 2) /* FIXME: 1.6 */
+#if CAIRO_VERSION >= CAIRO_VERSION_ENCODE(1, 6, 0)
 
 void cairo_ps_surface_restrict_to_level (cairo_surface_t *surface, cairo_ps_level_t level);
 
@@ -613,7 +733,29 @@ cairo_svg_surface_version_to_string (...)
 
 # --------------------------------------------------------------------------- #
 
-#if CAIRO_VERSION >= CAIRO_VERSION_ENCODE(1, 5, 8) /* FIXME: 1.6 */
+# The recording surface doesn't need the special package treatment because it
+# didn't exist in cairo 1.0.
+
+#ifdef CAIRO_HAS_RECORDING_SURFACE
+
+MODULE = Cairo::Surface	PACKAGE = Cairo::RecordingSurface	PREFIX = cairo_recording_surface_
+
+BOOT:
+	cairo_perl_set_isa ("Cairo::RecordingSurface", "Cairo::Surface");
+
+# cairo_surface_t * cairo_recording_surface_create (cairo_content_t, const cairo_rectangle_t *extents);
+cairo_surface_t_noinc *
+cairo_recording_surface_create (class, cairo_content_t content, cairo_rectangle_t_ornull *extents)
+    C_ARGS:
+	content, extents
+
+void cairo_recording_surface_ink_extents (cairo_surface_t *surface, OUTLIST double x0, OUTLIST double y0, OUTLIST double width, OUTLIST double height);
+
+#endif
+
+# --------------------------------------------------------------------------- #
+
+#if CAIRO_VERSION >= CAIRO_VERSION_ENCODE(1, 6, 0)
 
 MODULE = Cairo::Surface	PACKAGE = Cairo::Format	PREFIX = cairo_format_
 

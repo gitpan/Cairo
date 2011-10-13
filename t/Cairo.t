@@ -10,7 +10,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 73;
+use Test::More tests => 75;
 
 unless (eval 'use Test::Number::Delta; 1;') {
 	my $reason = 'Test::Number::Delta not available';
@@ -174,6 +174,13 @@ $cr->clip_preserve;
 $cr->reset_clip;
 
 SKIP: {
+	skip 'new stuff', 1
+		unless Cairo::VERSION >= Cairo::VERSION_ENCODE (1, 10, 0);
+
+	ok ($cr->in_clip (23, 42));
+}
+
+SKIP: {
 	skip 'new stuff', 7
 		unless Cairo::VERSION >= Cairo::VERSION_ENCODE (1, 4, 0);
 
@@ -209,6 +216,16 @@ my @glyphs = ({ index => 1, x => 2, y => 3 },
 
 $cr->show_text ('Urgs?');
 $cr->show_glyphs (@glyphs);
+
+SKIP: {
+	skip 'new stuff', 1
+		unless Cairo::VERSION >= Cairo::VERSION_ENCODE (1, 8, 0);
+
+	my @clusters = map { {num_bytes => 1, num_glyphs => 1} } (1 .. 3);
+	my $text = 'abc';
+	$cr->show_text_glyphs ($text, \@glyphs, \@clusters, ['backward']);
+	is ($cr->status, 'success');
+}
 
 my $face = $cr->get_font_face;
 isa_ok ($face, 'Cairo::FontFace');
@@ -258,7 +275,7 @@ isa_ok ($cr->get_source, 'Cairo::Pattern');
 
 SKIP: {
 	skip 'new stuff', 1
-		unless Cairo::VERSION >= Cairo::VERSION_ENCODE (1, 5, 10); # FIXME: 1.6
+		unless Cairo::VERSION >= Cairo::VERSION_ENCODE (1, 6, 0);
 
 	ok ($cr->has_current_point);
 }

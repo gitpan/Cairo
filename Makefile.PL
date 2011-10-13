@@ -61,23 +61,20 @@ if ($@ ne '') {
 	exit 0;
 }
 
-my %backend_guards = (
-	'cairo_pdf_surface_t' => 'CAIRO_HAS_PDF_SURFACE',
-	'cairo_ps_surface_t'  => 'CAIRO_HAS_PS_SURFACE',
-	'cairo_svg_surface_t' => 'CAIRO_HAS_SVG_SURFACE',
-);
-
 my %objects = (
 	'cairo_t *'             => 'Cairo::Context',
 	'cairo_font_face_t *'   => 'Cairo::FontFace',
 	'cairo_pattern_t *'     => 'Cairo::Pattern',
+	'cairo_region_t *'      => 'Cairo::Region',
 	'cairo_scaled_font_t *' => 'Cairo::ScaledFont',
 	'cairo_surface_t *'     => 'Cairo::Surface',
 );
 
 my %structs = (
-	'cairo_font_options_t *' => 'Cairo::FontOptions',
-	'cairo_matrix_t *'       => 'Cairo::Matrix',
+	'cairo_font_options_t *'  => 'Cairo::FontOptions',
+	'cairo_matrix_t *'        => 'Cairo::Matrix',
+	'cairo_rectangle_t *'     => 'Cairo::Rectangle',
+	'cairo_rectangle_int_t *' => 'Cairo::RectangleInt',
 );
 
 my %enums = (
@@ -215,24 +212,31 @@ my %enums = (
 	/],
 );
 
+my %flags = ();
+
 # --------------------------------------------------------------------------- #
 
-my $have_cairo_1_2 = ExtUtils::PkgConfig->atleast_version("cairo", "1.2.0");
-my $have_cairo_1_4 = ExtUtils::PkgConfig->atleast_version("cairo", "1.4.0");
-my $have_cairo_1_6 = ExtUtils::PkgConfig->atleast_version("cairo", "1.5.0"); # FIXME: 1.6
-
-if ($have_cairo_1_2) {
-	my %new = (
-		cairo_extend_t => [qw/CAIRO_EXTEND_PAD/],
-		cairo_format_t => [qw/CAIRO_FORMAT_RGB16_565/],
-		cairo_status_t => [qw/CAIRO_STATUS_INVALID_DSC_COMMENT/],
-	);
-
+sub add_new_enum_values {
+	my (%new) = @_;
 	foreach my $enum (keys %new) {
 		foreach my $value (@{$new{$enum}}) {
 			push @{$enums{$enum}}, $value;
 		}
 	}
+}
+
+my $have_cairo_1_2 = ExtUtils::PkgConfig->atleast_version("cairo", "1.2.0");
+my $have_cairo_1_4 = ExtUtils::PkgConfig->atleast_version("cairo", "1.4.0");
+my $have_cairo_1_6 = ExtUtils::PkgConfig->atleast_version("cairo", "1.6.0");
+my $have_cairo_1_8 = ExtUtils::PkgConfig->atleast_version("cairo", "1.8.0");
+my $have_cairo_1_10 = ExtUtils::PkgConfig->atleast_version("cairo", "1.10.0");
+
+if ($have_cairo_1_2) {
+	add_new_enum_values(
+		cairo_extend_t => [qw/CAIRO_EXTEND_PAD/],
+		cairo_format_t => [qw/CAIRO_FORMAT_RGB16_565/],
+		cairo_status_t => [qw/CAIRO_STATUS_INVALID_DSC_COMMENT/],
+	);
 
 	$enums{cairo_font_type_t} = [qw/
 		CAIRO_FONT_TYPE_
@@ -263,6 +267,9 @@ if ($have_cairo_1_2) {
 		CAIRO_SURFACE_TYPE_BEOS
 		CAIRO_SURFACE_TYPE_DIRECTFB
 		CAIRO_SURFACE_TYPE_SVG
+		CAIRO_SURFACE_TYPE_OS2
+		CAIRO_SURFACE_TYPE_WIN32_PRINTING
+		CAIRO_SURFACE_TYPE_QUARTZ_IMAGE
 	/];
 
 	$enums{cairo_svg_version_t} = [qw/
@@ -281,46 +288,117 @@ if ($have_cairo_1_2) {
 }
 
 if ($have_cairo_1_4) {
-	my %new = (
+	add_new_enum_values(
 		cairo_status_t => [qw/CAIRO_STATUS_INVALID_INDEX
 		                      CAIRO_STATUS_CLIP_NOT_REPRESENTABLE/],
 	);
-
-	foreach my $enum (keys %new) {
-		foreach my $value (@{$new{$enum}}) {
-			push @{$enums{$enum}}, $value;
-		}
-	}
 }
 
 if ($have_cairo_1_6) {
+	add_new_enum_values(
+		cairo_font_type_t => [qw/CAIRO_FONT_TYPE_QUARTZ/],
+		cairo_status_t => [qw/CAIRO_STATUS_TEMP_FILE_ERROR
+				      CAIRO_STATUS_INVALID_STRIDE/],
+
+	);
+
 	$enums{cairo_ps_level_t} = [qw/
 		CAIRO_PS_LEVEL_
 		CAIRO_PS_LEVEL_2
 		CAIRO_PS_LEVEL_3
 	/];
-
-	my %new = (
-		cairo_font_type_t => [qw/CAIRO_FONT_TYPE_QUARTZ/],
-	);
-
-	foreach my $enum (keys %new) {
-		foreach my $value (@{$new{$enum}}) {
-			push @{$enums{$enum}}, $value;
-		}
-	}
-
 } else {
 	$enums{cairo_ps_level_t} = [];
 }
 
+if ($have_cairo_1_8) {
+	add_new_enum_values(
+		cairo_status_t => [qw/CAIRO_STATUS_FONT_TYPE_MISMATCH
+				      CAIRO_STATUS_USER_FONT_IMMUTABLE
+				      CAIRO_STATUS_USER_FONT_ERROR
+				      CAIRO_STATUS_NEGATIVE_COUNT
+				      CAIRO_STATUS_INVALID_CLUSTERS
+				      CAIRO_STATUS_INVALID_SLANT
+				      CAIRO_STATUS_INVALID_WEIGHT/],
+	);
+
+	$flags{cairo_text_cluster_flags_t} = [qw/
+		CAIRO_TEXT_CLUSTER_FLAG_
+		CAIRO_TEXT_CLUSTER_FLAG_BACKWARD
+	/];
+} else {
+	$flags{cairo_text_cluster_flags_t} = [];
+}
+
+if ($have_cairo_1_10) {
+	add_new_enum_values(
+		cairo_surface_type_t => [
+			qw/CAIRO_SURFACE_TYPE_SCRIPT
+			   CAIRO_SURFACE_TYPE_QT
+			   CAIRO_SURFACE_TYPE_RECORDING
+			   CAIRO_SURFACE_TYPE_VG
+			   CAIRO_SURFACE_TYPE_GL
+			   CAIRO_SURFACE_TYPE_DRM
+			   CAIRO_SURFACE_TYPE_TEE
+			   CAIRO_SURFACE_TYPE_XML
+			   CAIRO_SURFACE_TYPE_SKIA
+			   CAIRO_SURFACE_TYPE_SUBSURFACE/],
+		cairo_operator_t => [
+			qw/CAIRO_OPERATOR_MULTIPLY
+			   CAIRO_OPERATOR_SCREEN
+			   CAIRO_OPERATOR_OVERLAY
+			   CAIRO_OPERATOR_DARKEN
+			   CAIRO_OPERATOR_LIGHTEN
+			   CAIRO_OPERATOR_COLOR_DODGE
+			   CAIRO_OPERATOR_COLOR_BURN
+			   CAIRO_OPERATOR_HARD_LIGHT
+			   CAIRO_OPERATOR_SOFT_LIGHT
+			   CAIRO_OPERATOR_DIFFERENCE
+			   CAIRO_OPERATOR_EXCLUSION
+			   CAIRO_OPERATOR_HSL_HUE
+			   CAIRO_OPERATOR_HSL_SATURATION
+			   CAIRO_OPERATOR_HSL_COLOR
+			   CAIRO_OPERATOR_HSL_LUMINOSITY/],
+	);
+
+	$enums{cairo_pdf_version_t} = [qw/
+		CAIRO_PDF_VERSION_
+		CAIRO_PDF_VERSION_1_4
+		CAIRO_PDF_VERSION_1_5
+	/];
+
+	$enums{cairo_region_overlap_t} = [qw/
+		CAIRO_REGION_OVERLAP_
+		CAIRO_REGION_OVERLAP_IN
+		CAIRO_REGION_OVERLAP_OUT
+		CAIRO_REGION_OVERLAP_PART
+	/];
+} else {
+	$enums{cairo_pdf_version_t} = [];
+	$enums{cairo_region_overlap_t} = [];
+}
+
 # --------------------------------------------------------------------------- #
 
-my %enum_guards = (
-	cairo_svg_version_t => $backend_guards{cairo_svg_surface_t},
+my %object_guards = (
+	cairo_region_t => '#if CAIRO_VERSION >= CAIRO_VERSION_ENCODE(1, 10, 0)',
 );
 
+my %struct_guards = (
+	cairo_rectangle_t     => '#if CAIRO_VERSION >= CAIRO_VERSION_ENCODE(1, 4, 0)',
+	cairo_rectangle_int_t => '#if CAIRO_VERSION >= CAIRO_VERSION_ENCODE(1, 10, 0)',
+);
+
+my %enum_guards = (
+	cairo_ps_level_t    => '#ifdef CAIRO_HAS_PS_SURFACE',
+	cairo_svg_version_t => '#ifdef CAIRO_HAS_SVG_SURFACE',
+);
+
+my %flag_guards = ();
+
 MakeHelper::do_enums (\%enums, \%enum_guards);
+
+MakeHelper::do_flags (\%flags, \%flag_guards);
 
 my @xs_files = qw(
 	Cairo.xs
@@ -330,6 +408,10 @@ my @xs_files = qw(
 	CairoPattern.xs
 	CairoSurface.xs
 );
+
+if ($have_cairo_1_10) {
+	push @xs_files, 'CairoRegion.xs';
+}
 
 my $have_cairo_ft = !system qw(pkg-config --exists --silence-errors cairo-ft);
 if ($have_cairo_ft) {
@@ -345,15 +427,18 @@ MakeHelper::write_boot (
 	ignore => '^Cairo$',
 );
 
-my @typemaps = MakeHelper::do_typemaps (\%objects, \%structs, \%enums,
-                                        \%backend_guards, \%enum_guards);
+my @typemaps = MakeHelper::do_typemaps (\%objects, \%structs, \%enums, \%flags,
+                                        \%object_guards,
+                                        \%struct_guards,
+                                        \%enum_guards,
+                                        \%flag_guards);
 push @typemaps, 'cairo-perl.typemap';
 
 my $dep = ExtUtils::Depends->new ('Cairo');
 $dep->set_inc ('-I. -I'.$autogen_dir.' '.$cairo_cfg{cflags});
 $dep->set_libs ($cairo_cfg{libs});
 $dep->add_xs (@xs_files);
-$dep->add_c ('cairo-perl-enums.c');
+$dep->add_c (qw/cairo-perl-enums.c cairo-perl-flags.c/);
 $dep->add_pm ('lib/Cairo.pm' => '$(INST_LIBDIR)/Cairo.pm');
 $dep->add_typemaps (@typemaps);
 

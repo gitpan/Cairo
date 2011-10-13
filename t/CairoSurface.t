@@ -12,12 +12,17 @@ use warnings;
 
 use Config; # for byteorder
 
-use Test::More tests => 72;
+use Test::More tests => 88;
 
 use constant IMG_WIDTH => 256;
 use constant IMG_HEIGHT => 256;
 
 use Cairo;
+
+unless (eval 'use Test::Number::Delta; 1;') {
+	my $reason = 'Test::Number::Delta not available';
+	*delta_ok = sub { SKIP: { skip $reason, 1 } };
+}
 
 my $surf = Cairo::ImageSurface->create ('rgb24', IMG_WIDTH, IMG_HEIGHT);
 isa_ok ($surf, 'Cairo::ImageSurface');
@@ -67,18 +72,31 @@ is ($surf->get_height, IMG_HEIGHT);
 	}
 }
 
-my $similar = $surf->create_similar ('color', IMG_WIDTH, IMG_HEIGHT);
+my $similar = Cairo::Surface->create_similar ($surf, 'color', IMG_WIDTH, IMG_HEIGHT);
 isa_ok ($similar, 'Cairo::ImageSurface');
 isa_ok ($similar, 'Cairo::Surface');
+
+# Test that create_similar can be called with both conventions.
+{
+	my $similar = $surf->create_similar ('color', IMG_WIDTH, IMG_HEIGHT);
+	isa_ok ($similar, 'Cairo::ImageSurface');
+	isa_ok ($similar, 'Cairo::Surface');
+
+	eval { Cairo::Surface->create_similar (1, 2) };
+	like ($@, qr/Usage/);
+
+	eval { Cairo::Surface->create_similar (1, 2, 3, 4, 5) };
+	like ($@, qr/Usage/);
+}
 
 # Test that the enum wrappers differentiate between color and color-alpha.
 SKIP: {
 	skip 'content tests', 2
 		unless Cairo::VERSION >= Cairo::VERSION_ENCODE (1, 2, 0);
 
-	my $tmp = $surf->create_similar ('color-alpha', IMG_WIDTH, IMG_HEIGHT);
+	my $tmp = Cairo::Surface->create_similar ($surf, 'color-alpha', IMG_WIDTH, IMG_HEIGHT);
 	is ($tmp->get_content, 'color-alpha');
-	$tmp = $surf->create_similar ('color', IMG_WIDTH, IMG_HEIGHT);
+	$tmp = Cairo::Surface->create_similar ($surf, 'color', IMG_WIDTH, IMG_HEIGHT);
 	is ($tmp->get_content, 'color');
 }
 
@@ -105,12 +123,30 @@ $surf->flush;
 
 SKIP: {
 	skip 'new stuff', 1
-		unless Cairo::VERSION >= Cairo::VERSION_ENCODE (1, 5, 8); # FIXME: 1.6
+		unless Cairo::VERSION >= Cairo::VERSION_ENCODE (1, 6, 0);
 
 	$surf->copy_page;
 	$surf->show_page;
 
 	like (Cairo::Format::stride_for_width ('argb32', 23), qr/\A\d+\z/);
+}
+
+SKIP: {
+	skip 'new stuff', 2
+		unless Cairo::VERSION >= Cairo::VERSION_ENCODE (1, 8, 0);
+
+	$surf->set_fallback_resolution (72, 72);
+	delta_ok ([$surf->get_fallback_resolution], [72, 72]);
+
+	ok (defined $surf->has_show_text_glyphs);
+}
+
+SKIP: {
+	skip 'new stuff', 1
+		unless Cairo::VERSION >= Cairo::VERSION_ENCODE (1, 8, 0);
+
+	my $rect_surf = Cairo::Surface->create_for_rectangle ($surf, 0, 0, 10, 10);
+	isa_ok ($rect_surf, 'Cairo::Surface');
 }
 
 $surf->finish;
@@ -180,7 +216,7 @@ SKIP: {
 }
 
 SKIP: {
-	skip 'pdf surface', 8
+	skip 'pdf surface', 13
 		unless Cairo::HAS_PDF_SURFACE;
 
 	my $surf = Cairo::PdfSurface->create ('tmp.pdf', IMG_WIDTH, IMG_HEIGHT);
@@ -194,20 +230,9 @@ SKIP: {
 		$surf->set_size (23, 42);
 	}
 
-	$surf = $surf->create_similar ('alpha', IMG_WIDTH, IMG_HEIGHT);
+	# create_similar might return any kind of surface
+	$surf = Cairo::Surface->create_similar ($surf, 'alpha', IMG_WIDTH, IMG_HEIGHT);
 	isa_ok ($surf, 'Cairo::Surface');
-
-	# create_similar actually returns an image surface at the moment, but
-	# the compatibility layer has no way of knowing this and thus turns it
-	# into a pdf surface.  Recently, it also started returning meta
-	# surfaces whose type is internal, so the bindings have no other choice
-	# but represent them as plain surfaces.  Thus, mark this TODO for now.
-	TODO: {
-		local $TODO = 'create_similar returns surfaces whose type is not predictable';
-		isa_ok ($surf, 'Cairo::ImageSurface');
-	}
-
-	unlink 'tmp.pdf';
 
 	SKIP: {
 		skip 'create_for_stream on pdf surfaces', 4
@@ -222,10 +247,32 @@ SKIP: {
 		isa_ok ($surf, 'Cairo::PdfSurface');
 		isa_ok ($surf, 'Cairo::Surface');
 	}
+
+	SKIP: {
+		skip 'new stuff', 6
+			unless Cairo::VERSION >= Cairo::VERSION_ENCODE (1, 10, 0);
+
+		my $surf = Cairo::PdfSurface->create ('tmp.pdf', IMG_WIDTH, IMG_HEIGHT);
+		$surf->restrict_to_version ('1-4');
+		$surf->restrict_to_version ('1-5');
+
+		my @versions = Cairo::PdfSurface::get_versions();
+		ok (scalar @versions > 0);
+		is ($versions[0], '1-4');
+
+		@versions = Cairo::PdfSurface->get_versions();
+		ok (scalar @versions > 0);
+		is ($versions[0], '1-4');
+
+		like (Cairo::PdfSurface::version_to_string('1-4'), qr/1\.4/);
+		like (Cairo::PdfSurface->version_to_string('1-4'), qr/1\.4/);
+	}
+
+	unlink 'tmp.pdf';
 }
 
 SKIP: {
-	skip 'ps surface', 15
+	skip 'ps surface', 14
 		unless Cairo::HAS_PS_SURFACE;
 
 	my $surf = Cairo::PsSurface->create ('tmp.ps', IMG_WIDTH, IMG_HEIGHT);
@@ -247,17 +294,9 @@ SKIP: {
 		$surf->dsc_begin_page_setup;
 	}
 
-	$surf = $surf->create_similar ('alpha', IMG_WIDTH, IMG_HEIGHT);
+	# create_similar might return any kind of surface
+	$surf = Cairo::Surface->create_similar ($surf, 'alpha', IMG_WIDTH, IMG_HEIGHT);
 	isa_ok ($surf, 'Cairo::Surface');
-
-	# create_similar actually returns an image surface at the moment, but
-	# the compatibility layer has no way of knowing this and thus turns it
-	# into a ps surface.
-	if (Cairo::VERSION >= Cairo::VERSION_ENCODE (1, 2, 0)) {
-		isa_ok ($surf, 'Cairo::ImageSurface');
-	} else {
-		isa_ok ($surf, 'Cairo::PsSurface');
-	}
 
 	unlink 'tmp.ps';
 
@@ -281,7 +320,7 @@ SKIP: {
 
 	SKIP: {
 		skip 'new stuff', 7
-			unless Cairo::VERSION >= Cairo::VERSION_ENCODE (1, 5, 2); # FIXME: 1.6
+			unless Cairo::VERSION >= Cairo::VERSION_ENCODE (1, 6, 0);
 
 		$surf->restrict_to_level ('2');
 		$surf->restrict_to_level ('3');
@@ -340,4 +379,26 @@ SKIP: {
 
 	like (Cairo::SvgSurface::version_to_string('1-1'), qr/1\.1/);
 	like (Cairo::SvgSurface->version_to_string('1-1'), qr/1\.1/);
+}
+
+SKIP: {
+	skip 'svg surface', 5
+		unless Cairo::HAS_RECORDING_SURFACE;
+
+	my $surf = Cairo::RecordingSurface->create (
+	             'color',
+	             {x=>10, y=>10, width=>5, height=>5});
+	isa_ok ($surf, 'Cairo::RecordingSurface');
+	isa_ok ($surf, 'Cairo::Surface');
+
+	# Test that the extents rectangle was marshalled correctly.
+	my $cr = Cairo::Context->create ($surf);
+	$cr->move_to (0, 0);
+	$cr->line_to (30, 30);
+	$cr->paint;
+	is_deeply ([$surf->ink_extents], [10, 10, 5, 5]);
+
+	$surf = Cairo::RecordingSurface->create ('color', undef);
+	isa_ok ($surf, 'Cairo::RecordingSurface');
+	isa_ok ($surf, 'Cairo::Surface');
 }

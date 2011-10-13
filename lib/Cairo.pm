@@ -3,6 +3,8 @@
 #
 # Licensed under the LGPL, see LICENSE file for more information.
 #
+# $Id$
+#
 
 package Cairo;
 
@@ -12,7 +14,7 @@ use DynaLoader;
 
 our @ISA = qw/DynaLoader/;
 
-our $VERSION = '1.062';
+our $VERSION = '1.080';
 
 sub dl_load_flags { $^O eq 'darwin' ? 0x00 : 0x01 }
 
@@ -254,6 +256,16 @@ C<$cr-E<gt>restore> to restore to the saved state.
 
 =item ($x1, $y1, $x2, $y2) = $cr->clip_extents [1.4]
 
+=item $bool = $cr->in_clip ($x, $y) [1.10]
+
+=over
+
+=item $x: double
+
+=item $y: double
+
+=back
+
 =item @rectangles = $cr->copy_clip_rectangle_list [1.4]
 
 =item $cr->reset_clip
@@ -341,8 +353,8 @@ C<$cr-E<gt>restore> to restore to the saved state.
   ];
 
 I<Cairo::Path> is a data structure for holding a path. This data structure
-serves as the return value for C<$cr-E<gt>copy_path_data> and
-C<$cr-E<gt>copy_path_data_flat> as well the input value for
+serves as the return value for C<$cr-E<gt>copy_path> and
+C<$cr-E<gt>copy_path_flat> as well the input value for
 C<$cr-E<gt>append_path>.
 
 I<Cairo::Path> is represented as an array reference that contains path
@@ -381,6 +393,18 @@ path element:
 The semantics and ordering of the coordinate values are consistent with
 C<$cr-E<gt>move_to>, C<$cr-E<gt>line_to>, C<$cr-E<gt>curve_to>, and
 C<$cr-E<gt>close_path>.
+
+Note that the paths returned by Cairo are implemented as tied array references
+which do B<not> support adding, removing or shuffling of path segments.  For
+these operations, you need to make a shallow copy first:
+
+  my @path_clone = @{$path};
+  # now you can alter @path_clone which ever way you want
+
+The points of a single path element can be changed directly, however, without
+the need for a shallow copy:
+
+  $path->[$i]{points} = [[3, 4], [5, 6], [7, 8]];
 
 =over
 
@@ -560,6 +584,26 @@ C<$cr-E<gt>close_path>.
 
 =item $type = $pattern->get_type [1.2]
 
+=item $pattern->set_extend ($extend)
+
+=over
+
+=item $extend: I<Cairo::Extend>
+
+=back
+
+=item $extend = $pattern->get_extend
+
+=item $pattern->set_filter ($filter)
+
+=over
+
+=item $filter: I<Cairo::Filter>
+
+=back
+
+=item $filter = $pattern->get_filter
+
 =item $pattern->set_matrix ($matrix)
 
 =over
@@ -605,26 +649,6 @@ C<$cr-E<gt>close_path>.
 =item $surface: I<Cairo::Surface>
 
 =back
-
-=item $pattern->set_extend ($extend)
-
-=over
-
-=item $extend: I<Cairo::Extend>
-
-=back
-
-=item $extend = $pattern->get_extend
-
-=item $pattern->set_filter ($filter)
-
-=over
-
-=item $filter: I<Cairo::Filter>
-
-=back
-
-=item $filter = $pattern->get_filter
 
 =item $surface = $pattern->get_surface [1.4]
 
@@ -698,6 +722,90 @@ C<$cr-E<gt>close_path>.
 
 A color stop is represented as an array reference with five elements: offset,
 red, green, blue, and alpha.
+
+=back
+
+=cut
+
+# --------------------------------------------------------------------------- #
+
+=head3 Regions -- Representing a pixel-aligned area
+
+=over
+
+=item $region = Cairo::Region->create (...) [1.10]
+
+=over
+
+=item ...: zero or more I<Cairo::RectangleInt>
+
+=back
+
+=item $status = $region->status [1.10]
+
+=item $num = $region->num_rectangles [1.10]
+
+=item $rect = $region->get_rectangle ($i) [1.10]
+
+=over
+
+=item $i: integer
+
+=back
+
+=item $bool = $region->is_empty [1.10]
+
+=item $bool = $region->contains_point ($x, $y) [1.10]
+
+=over
+
+=item $x: integer
+
+=item $y: integer
+
+=back
+
+=item $bool = $region_one->equal ($region_two) [1.10]
+
+=over
+
+=item $region_two: I<Cairo::Region>
+
+=back
+
+=item $region->translate ($dx, $dy) [1.10]
+
+=over
+
+=item $dx: integer
+
+=item $dy: integer
+
+=back
+
+=item $status = $dst->intersect ($other) [1.10]
+
+=item $status = $dst->intersect_rectangle ($rect) [1.10]
+
+=item $status = $dst->subtract ($other) [1.10]
+
+=item $status = $dst->subtract_rectangle ($rect) [1.10]
+
+=item $status = $dst->union ($other) [1.10]
+
+=item $status = $dst->union_rectangle ($rect) [1.10]
+
+=item $status = $dst->xor ($other) [1.10]
+
+=item $status = $dst->xor_rectangle ($rect) [1.10]
+
+=over
+
+=item $other: I<Cairo::Region>
+
+=item $rect: I<Cairo::RectangleInt>
+
+=back
 
 =back
 
@@ -880,6 +988,20 @@ I<x> and I<y>.  Example:
 
 =back
 
+=item $cr->show_text_glyphs ($utf8, $glyphs, $clusters, $cluster_flags) [1.8]
+
+=over
+
+=item $utf8: string
+
+=item $glyphs: array ref of glyphs
+
+=item $clusters: array ref of clusters
+
+=item $cluster_flags: I<Cairo::TextClusterFlags>
+
+=back
+
 =item $face = $cr->get_font_face
 
 =item $extents = $cr->font_extents
@@ -915,6 +1037,24 @@ I<x> and I<y>.  Example:
 =item ...: list of glyphs
 
 =back
+
+=item $face = Cairo::ToyFontFace->create ($family, $slant, $weight) [1.8]
+
+=over
+
+=item $family: string
+
+=item $slant: I<Cairo::FontSlant>
+
+=item $weight: I<Cairo::FontWeight>
+
+=back
+
+=item $family = $face->get_family [1.8]
+
+=item $slang = $face->get_slant [1.8]
+
+=item $weight = $face->get_weight [1.8]
 
 =back
 
@@ -976,6 +1116,18 @@ I<x> and I<y>.  Example:
 
 =back
 
+=item ($status, $glyphs, $clusters, $cluster_flags) = $scaled_font->text_to_glyphs ($x, $y, $utf8) [1.8]
+
+=over
+
+=item $x: double
+
+=item $y: double
+
+=item $utf8: string
+
+=back
+
 =item $font_face = $scaled_font->get_font_face [1.2]
 
 =item $options = $scaled_font->get_font_options [1.2]
@@ -983,6 +1135,8 @@ I<x> and I<y>.  Example:
 =item $font_matrix = $scaled_font->get_font_matrix [1.2]
 
 =item $ctm = $scaled_font->get_ctm [1.2]
+
+=item $scale_matrix = $scaled_font->get_scale_matrix [1.8]
 
 =item $type = $scaled_font->get_type [1.2]
 
@@ -1103,15 +1257,37 @@ from a file:
 
 =over
 
-=item $new = $old->create_similar ($content, $width, $height)
+=item $similar = Cairo::Surface->create_similar ($other, $content, $width, $height)
 
 =over
+
+=item $other: I<Cairo::Surface>
 
 =item $content: I<Cairo::Content>
 
 =item $width: integer
 
 =item $height: integer
+
+=back
+
+For hysterical reasons, you can also use the following syntax:
+
+  $similar = $other->create_similar ($content, $width, $height)
+
+=item $new = Cairo::Surface->create_for_rectangle ($target, $x, $y, $width, $height) [1.10]
+
+=over
+
+=item $target: I<Cairo::Surface>
+
+=item $x: double
+
+=item $y: double
+
+=item $width: double
+
+=item $height: double
 
 =back
 
@@ -1163,6 +1339,8 @@ from a file:
 
 =back
 
+=item ($x_pixels_per_inch, $y_pixels_per_inch) = $surface->get_fallback_resolution [1.8]
+
 =item $type = $surface->get_type [1.2]
 
 =item $status = $surface->copy_page [1.6]
@@ -1180,6 +1358,8 @@ from a file:
 =item $status: I<Cairo::Status>
 
 =back
+
+=item $boolean = $surface->has_show_text_glyphs [1.8]
 
 =back
 
@@ -1272,6 +1452,24 @@ from a file:
 =item $width_in_points: double
 
 =item $height_in_points: double
+
+=back
+
+=item $surface->restrict_to_version ($version) [1.10]
+
+=over
+
+=item $version: I<Cairo::PdfVersion>
+
+=back
+
+=item @versions = Cairo::PdfSurface::get_versions [1.10]
+
+=item $string = Cairo::PdfSurface::version_to_string ($version) [1.10]
+
+=over
+
+=item $version: I<Cairo::PdfVersion>
 
 =back
 
@@ -1428,6 +1626,28 @@ from a file:
 =back
 
 =item $eps = $surface->get_eps [1.6]
+
+=back
+
+=cut
+
+# --------------------------------------------------------------------------- #
+
+=head3 Recording Surfaces -- Records all drawing operations
+
+=over
+
+=item $surface = Cairo::RecordingSurface->create ($content, $extents) [1.10]
+
+=over
+
+=item $content: I<Cairo::Content>
+
+=item $extents: I<Cairo::Rectangle>
+
+=back
+
+=item ($x0, $y0, $width, $height) = $surface->ink_extents [1.10]
 
 =back
 

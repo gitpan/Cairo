@@ -7,6 +7,7 @@
  */
 
 #include <cairo-perl.h>
+#include <cairo-perl-private.h>
 
 static const cairo_user_data_key_t face_key;
 
@@ -17,6 +18,9 @@ face_destroy (void *face)
 }
 
 MODULE = Cairo::Ft	PACKAGE = Cairo::FtFontFace PREFIX = cairo_ft_font_face_
+
+BOOT:
+	cairo_perl_set_isa ("Cairo::FtFontFace", "Cairo::FontFace");
 
 # cairo_font_face_t * cairo_ft_font_face_create_for_ft_face (FT_Face face, int load_flags);
 cairo_font_face_t_noinc *

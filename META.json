@@ -1,0 +1,48 @@
+{
+   "abstract" : "Perl interface to the cairo library",
+   "author" : [
+      "unknown"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.59, CPAN::Meta::Converter version 2.112621",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Cairo",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ],
+      "x_files" : [
+         "inc/MakeHelper.pm"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : 0,
+            "Test::Number::Delta" : "1"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::Depends" : "0.2",
+            "ExtUtils::MakeMaker" : 0,
+            "ExtUtils::PkgConfig" : "1"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "ExtUtils::Depends" : "0.2",
+            "ExtUtils::PkgConfig" : "1"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "1.080"
+}
