@@ -14,7 +14,7 @@ use DynaLoader;
 
 our @ISA = qw/DynaLoader/;
 
-our $VERSION = '1.080';
+our $VERSION = '1.081';
 
 sub dl_load_flags { $^O eq 'darwin' ? 0x00 : 0x01 }
 
@@ -30,7 +30,7 @@ __END__
 
 =head1 NAME
 
-Cairo - Perl interface to the cairo library
+Cairo - Perl interface to the cairo 2d vector graphics library
 
 =head1 SYNOPSIS
 

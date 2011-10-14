@@ -1,5 +1,5 @@
 {
-   "abstract" : "Perl interface to the cairo library",
+   "abstract" : "Perl interface to the cairo 2d vector graphics library",
    "author" : [
       "unknown"
    ],
@@ -44,5 +44,5 @@
       }
    },
    "release_status" : "stable",
-   "version" : "1.080"
+   "version" : "1.081"
 }
