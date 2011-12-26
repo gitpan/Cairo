@@ -1,28 +1,27 @@
----
-abstract: 'Perl interface to the cairo 2d vector graphics library'
-author:
-  - unknown
-build_requires:
-  ExtUtils::MakeMaker: 0
-  Test::Number::Delta: 1
+--- #YAML:1.0
+name:               Cairo
+version:            1.082
+abstract:           Perl interface to the cairo 2d vector graphics library
+author:  []
+license:            unknown
+distribution_type:  module
 configure_requires:
-  ExtUtils::Depends: 0.2
-  ExtUtils::MakeMaker: 0
-  ExtUtils::PkgConfig: 1
-dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.59, CPAN::Meta::Converter version 2.112621'
-license: unknown
-meta-spec:
-  url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
-name: Cairo
-no_index:
-  directory:
-    - t
-    - inc
-  x_files:
-    - inc/MakeHelper.pm
+    ExtUtils::Depends:    0.2
+    ExtUtils::MakeMaker:  0
+    ExtUtils::PkgConfig:  1
+build_requires:
+    ExtUtils::MakeMaker:  0
+    Test::Number::Delta:  1
 requires:
-  ExtUtils::Depends: 0.2
-  ExtUtils::PkgConfig: 1
-version: 1.081
+    ExtUtils::Depends:    0.2
+    ExtUtils::PkgConfig:  1
+no_index:
+    directory:
+        - t
+        - inc
+    files:
+        - inc/MakeHelper.pm
+generated_by:       ExtUtils::MakeMaker version 6.57_05
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4
