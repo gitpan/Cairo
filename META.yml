@@ -1,6 +1,6 @@
 --- #YAML:1.0
 name:               Cairo
-version:            1.082
+version:            1.090
 abstract:           Perl interface to the cairo 2d vector graphics library
 author:  []
 license:            unknown
