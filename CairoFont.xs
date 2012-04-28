@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2004-2005 by the cairo perl team (see the file README)
+ * Copyright (c) 2004-2005, 2012 by the cairo perl team (see the file README)
  *
  * Licensed under the LGPL, see LICENSE file for more information.
  *
@@ -28,8 +28,12 @@ get_package (cairo_font_face_t *face)
 
 	    /* These aren't wrapped yet: */
 	    case CAIRO_FONT_TYPE_WIN32:
+#if CAIRO_VERSION >= CAIRO_VERSION_ENCODE(1, 6, 0)
 	    case CAIRO_FONT_TYPE_QUARTZ:
+#endif
+#if CAIRO_VERSION >= CAIRO_VERSION_ENCODE(1, 8, 0)
 	    case CAIRO_FONT_TYPE_USER:
+#endif
 		package = "Cairo::FontFace";
 		break;
 
@@ -41,7 +45,7 @@ get_package (cairo_font_face_t *face)
 
 	return package;
 #else
-	const char *package = cairo_perl_package_table_lookup (pattern);
+	const char *package = cairo_perl_package_table_lookup (face);
 	return package ? package : "Cairo::FontFace";
 #endif
 }
@@ -81,11 +85,15 @@ BOOT:
 
 # cairo_font_face_t * cairo_toy_font_face_create (const char *family, cairo_font_slant_t slant, cairo_font_weight_t weight)
 cairo_font_face_t_noinc *
-cairo_toy_font_face_create (class, const char *family, cairo_font_slant_t slant, cairo_font_weight_t weight)
+cairo_toy_font_face_create (class, const char_utf8 *family, cairo_font_slant_t slant, cairo_font_weight_t weight)
     C_ARGS:
 	family, slant, weight
+    POSTCALL:
+#if CAIRO_VERSION < CAIRO_VERSION_ENCODE(1, 2, 0)
+	cairo_perl_package_table_insert (RETVAL, "Cairo::ToyFontFace");
+#endif
 
-const char * cairo_toy_font_face_get_family (cairo_font_face_t *font_face);
+const char_utf8 * cairo_toy_font_face_get_family (cairo_font_face_t *font_face);
 
 cairo_font_slant_t  cairo_toy_font_face_get_slant (cairo_font_face_t *font_face);
 
@@ -101,6 +109,10 @@ MODULE = Cairo::Font	PACKAGE = Cairo::ScaledFont	PREFIX = cairo_scaled_font_
 cairo_scaled_font_t_noinc * cairo_scaled_font_create (class, cairo_font_face_t *font_face, const cairo_matrix_t *font_matrix, const cairo_matrix_t *ctm, const cairo_font_options_t *options)
     C_ARGS:
 	font_face, font_matrix, ctm, options
+    POSTCALL:
+#if CAIRO_VERSION < CAIRO_VERSION_ENCODE(1, 2, 0)
+	cairo_perl_package_table_insert (RETVAL, "Cairo::ScaledFont");
+#endif
 
 cairo_status_t cairo_scaled_font_status (cairo_scaled_font_t *scaled_font);
 
@@ -123,7 +135,7 @@ cairo_font_extents_t * cairo_scaled_font_extents (cairo_scaled_font_t *scaled_fo
 #if CAIRO_VERSION >= CAIRO_VERSION_ENCODE(1, 2, 0)
 
 ##void cairo_scaled_font_text_extents (cairo_scaled_font_t *scaled_font, const char *utf8, cairo_text_extents_t *extents);
-cairo_text_extents_t * cairo_scaled_font_text_extents (cairo_scaled_font_t *scaled_font, const char *utf8)
+cairo_text_extents_t * cairo_scaled_font_text_extents (cairo_scaled_font_t *scaled_font, const char_utf8 *utf8)
     PREINIT:
 	cairo_text_extents_t extents;
     CODE:
@@ -166,6 +178,7 @@ cairo_scaled_font_text_to_glyphs (cairo_scaled_font_t *scaled_font, double x, do
 	cairo_text_cluster_flags_t cluster_flags;
 	cairo_status_t status;
     PPCODE:
+	sv_utf8_upgrade (utf8_sv);
 	utf8 = SvPV (utf8_sv, utf8_len);
 	status = cairo_scaled_font_text_to_glyphs (
 	           scaled_font,

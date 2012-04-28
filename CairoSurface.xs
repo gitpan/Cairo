@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2004-2006 by the cairo perl team (see the file README)
+ * Copyright (c) 2004-2006, 2012 by the cairo perl team (see the file README)
  *
  * Licensed under the LGPL, see LICENSE file for more information.
  *
@@ -98,9 +98,13 @@ get_package (cairo_surface_t *surface)
 	    case CAIRO_SURFACE_TYPE_WIN32:
 	    case CAIRO_SURFACE_TYPE_BEOS:
 	    case CAIRO_SURFACE_TYPE_DIRECTFB:
+#if CAIRO_VERSION >= CAIRO_VERSION_ENCODE(1, 4, 0)
 	    case CAIRO_SURFACE_TYPE_OS2:
+#endif
+#if CAIRO_VERSION >= CAIRO_VERSION_ENCODE(1, 6, 0)
 	    case CAIRO_SURFACE_TYPE_WIN32_PRINTING:
 	    case CAIRO_SURFACE_TYPE_QUARTZ_IMAGE:
+#endif
 #if CAIRO_VERSION >= CAIRO_VERSION_ENCODE(1, 10, 0)
 	    case CAIRO_SURFACE_TYPE_SCRIPT:
 	    case CAIRO_SURFACE_TYPE_QT:
