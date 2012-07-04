@@ -17,10 +17,10 @@
 static HV *pointer_to_package = NULL;
 
 /* A hex character represents four bits in the address of a pointer, so we'll
- * need BITS_PER_LONG/4 characters.  That's sizeof (long) * 2.  Add 2 for the
- * "0x" part.  Add 1 for the trailing \0.  Reasoning courtesy of Robert Love.
+ * need BITS_PER_POINTER/4 characters.  That's sizeof (void*) * 2.  Add 2 for
+ * the "0x" part.  Add 1 for the trailing \0.
  */
-#define MAX_KEY_LENGTH ((sizeof(long) * 2) + 2 + 1)
+#define MAX_KEY_LENGTH ((sizeof(void*) * 2) + 2 + 1)
 
 /* This stuff is also used in CairoPattern.xs, hence no static on the
  * functions.
@@ -279,7 +279,10 @@ read_func_marshaller (void *closure,
 		SvREFCNT_dec (sv);
 	} else {
 		SV *retval = POPs;
-		memcpy (data, SvPV_nolen (retval), sv_len (retval));
+		STRLEN len = 0;
+		const char *sv_data = SvPV (retval, len);
+		/* should we assert that len == length? */
+		memcpy (data, sv_data, len);
 	}
 
 	PUTBACK;
