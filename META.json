@@ -4,7 +4,7 @@
       "Cairo Perl Team <gtk-perl-list at gnome dot org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.120921",
+   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.141520",
    "license" : [
       "lgpl_2_1"
    ],
@@ -23,7 +23,19 @@
       ]
    },
    "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
       "configure" : {
+         "requires" : {
+            "ExtUtils::Depends" : "0.2",
+            "ExtUtils::MakeMaker" : "0",
+            "ExtUtils::PkgConfig" : "1"
+         }
+      },
+      "runtime" : {
          "requires" : {
             "ExtUtils::Depends" : "0.2",
             "ExtUtils::PkgConfig" : "1"
@@ -52,5 +64,5 @@
       },
       "x_MailingList" : "https://mail.gnome.org/mailman/listinfo/gtk-perl-list"
    },
-   "version" : "1.104"
+   "version" : "1.105"
 }
